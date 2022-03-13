@@ -2,7 +2,7 @@ package goTest
 
 import (
 	"fmt"
-	"go_cloud/common/translate"
+
 	"testing"
 )
 
