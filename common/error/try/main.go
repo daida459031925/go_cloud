@@ -1,4 +1,4 @@
-package tryTool
+package try
 
 import "reflect"
 

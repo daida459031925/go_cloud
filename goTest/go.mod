@@ -1,0 +1,1 @@
+module github.com/daida459031925/goTest

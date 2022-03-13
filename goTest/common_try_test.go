@@ -2,7 +2,7 @@ package goTest
 
 import (
 	"fmt"
-	try "go_cloud/common/error/tryTool"
+	"go_cloud/common/error/try"
 	"testing"
 )
 

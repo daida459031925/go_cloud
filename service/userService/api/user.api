@@ -1,21 +1,41 @@
 syntax = "v1"
 
 info(
-    title: "type title here"
-    desc: "type desc here"
-    author: "type author here"
-    email: "type email here"
-    version: "type version here"
+	title: "type title here"
+	desc: "type desc here"
+	author: "type author here"
+	email: "type email here"
+	version: "type version here"
 )
 
 type (
-    LoginReq{
-        Account string `json:"account"`
-        Password string `json:"password"`
-    }
+	LoginReq {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
 
-//    LoginReply{
-//        Id
-//    }
+	LoginReply {
+		Id           int64  `json:"id"`
+		Name         string `json:"name"`
+		Gender       string `json:"gender"`
+		AccessToken  string `json:"accessToken"`
+		AccessExpire int64  `json:"accessExpire"`
+		RefreshAfter int64  `json:"refreshAfter"`
+	}
+
+	LoginRepl1y {
+		Id           int64  `json:"id"`
+		Name         string `json:"name"`
+		Gender       string `json:"gender"`
+		AccessToken  string `json:"accessToken"`
+		AccessExpire int64  `json:"accessExpire"`
+	}
 )
 
+service user-api {
+	@handler login
+	post /user/login (LoginReq) returns (LoginReply)
+	
+	@handler login1
+	post /user/login1 (LoginReq) returns (result.Result)
+}

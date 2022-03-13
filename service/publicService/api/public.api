@@ -1,0 +1,17 @@
+syntax = "v1"
+
+
+info(
+	title: "type title here"
+	desc: "type desc here"
+	author: "type author here"
+	email: "type email here"
+	version: "type version here"
+)
+
+
+
+service public-api {
+	@handler translate
+	get /public/translate () returns ()
+}
