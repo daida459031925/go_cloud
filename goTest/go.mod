@@ -1,6 +1,6 @@
 module github.com/daida459031925/go_cloud/goTest
 
-go 1.18
+go 1.19
 
 require (
 	github.com/daida459031925/common v0.0.0-20220531004522-05e04e2fc334

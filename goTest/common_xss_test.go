@@ -40,14 +40,14 @@ func TestJsonPast(t *testing.T) {
 	var users Users
 	b := bytes.NewBufferString(jsonString)
 	json.Unmarshal(b.Bytes(), &users)
-	var a = "<>"
+	var a = "实验1<>\"\"''"
 	fmt.Println(reflect.ValueOf(&a).Kind())
-	x := XssUtilInit(XssEscape, Json, &users)
-	x.xssCode()
-	fmt.Println(users)
-	x1 := XssUtilInit(XssUnEscape, Json, &users)
+	//x := XssUtilInit(XssEscape, Json, &a)
+	//x.xssCode()
+	//fmt.Println(a)
+	x1 := XssUtilInit(XssUnEscape, Json, &a)
 	x1.xssCode()
-	fmt.Println(users)
+	fmt.Println(a)
 }
 
 //1. Reflection goes from interface value to reflection Object.
@@ -127,7 +127,7 @@ func fieldSlice(value reflect.Value, xssType XssType, tagType TagType, filter []
 	}
 }
 
-//编码 " => &#34;
+// 编码 " => &#34;
 func escapeString(value reflect.Value, name string, filter []string) {
 	if value.Kind() == reflect.String {
 		if filter != nil && len(filter) > 0 {
@@ -141,7 +141,7 @@ func escapeString(value reflect.Value, name string, filter []string) {
 	}
 }
 
-//解码 &#34; => "
+// 解码 &#34; => "
 func unEscapeString(value reflect.Value, name string, filter []string) {
 	if value.Kind() == reflect.String {
 		if filter != nil && len(filter) > 0 {
