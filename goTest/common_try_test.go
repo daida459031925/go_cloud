@@ -2,10 +2,11 @@ package goTest
 
 import (
 	"fmt"
-
+	"github.com/daida459031925/common/error/try"
 	"testing"
 )
 
+//try测试
 func TestTry(t *testing.T) {
 
 	try.Try(func() {
