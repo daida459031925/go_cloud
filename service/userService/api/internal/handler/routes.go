@@ -19,8 +19,13 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodPost,
-				Path:    "/user/login1",
-				Handler: login1Handler(serverCtx),
+				Path:    "/user/logout",
+				Handler: logoutHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/user/refresh",
+				Handler: refreshHandler(serverCtx),
 			},
 		},
 	)

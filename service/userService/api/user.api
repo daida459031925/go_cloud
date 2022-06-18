@@ -9,33 +9,52 @@ info(
 )
 
 type (
-	LoginReq {
-		Username string `json:"username"`
-		Password string `json:"password"`
+	Login {
+		Username string `json:"username" form:"username" validate:"required"`
+		Password string `json:"password" form:"password" validate:`
 	}
 
-	LoginReply {
+	UserToken {
 		Id           int64  `json:"id"`
-		Name         string `json:"name"`
-		Gender       string `json:"gender"`
+		Name         string `json:"name,optional"`
+		Gender       string `json:"gender,optional"`
 		AccessToken  string `json:"accessToken"`
 		AccessExpire int64  `json:"accessExpire"`
 		RefreshAfter int64  `json:"refreshAfter"`
 	}
 
-	LoginRepl1y {
-		Id           int64  `json:"id"`
-		Name         string `json:"name"`
-		Gender       string `json:"gender"`
-		AccessToken  string `json:"accessToken"`
-		AccessExpire int64  `json:"accessExpire"`
+	SysUser struct {
+		Id          uint64          `json:"id"`          // 唯一主键id
+		Account     string `json:"account"`     // 账号
+		Password    string `json:"password"`    // 密码
+		Gender      int  `json:"gender,default=0,options=0|1|2"`      // 性别（男|女|未知）
+	}
+
+	ReturnSysUser struct {
+		Id          uint64          `json:"id"`          // 唯一主键id
+		Account     string `json:"account"`     // 账号
+		Gender      int  `json:"gender,default=0,options=0|1|2"`      // 性别（男|女|未知）
+		CreateTime  sql.NullTime   `json:"createTime,optional"`  // 创建时间
+		UpdateTime  sql.NullTime   `json:"updateTime,optional"`  // 最后更新时间
+		CreateBy    uint64 `json:"createBy"`    // 创建人
+		UpdateBy    uint64 `json:"updateBy"`    // 最后更新人
 	}
 )
 
 service user-api {
+	//登录
 	@handler login
-	post /user/login (LoginReq) returns (LoginReply)
-	
-	@handler login1
-	post /user/login1 (LoginReq) returns (result.Result)
+	post /user/login (Login) returns (UserToken)
+	//退出
+	@handler logout
+	post /user/logout (UserToken) returns ()
+	//刷新token
+	@handler refresh
+	post /user/refresh (UserToken) returns(UserToken)
+	//添加用户
+	@handler add
+	post /user/add (SysUser) returns(ReturnSysUser)
+	@handler upd
+	post /user/upd (SysUser) returns(ReturnSysUser)
+
 }

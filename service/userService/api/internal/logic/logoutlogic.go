@@ -9,22 +9,22 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type Login1Logic struct {
+type LogoutLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewLogin1Logic(ctx context.Context, svcCtx *svc.ServiceContext) Login1Logic {
-	return Login1Logic{
+func NewLogoutLogic(ctx context.Context, svcCtx *svc.ServiceContext) LogoutLogic {
+	return LogoutLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *Login1Logic) Login1(req types.LoginReq) (resp *types.LoginReply, err error) {
+func (l *LogoutLogic) Logout(req types.UserToken) error {
 	// todo: add your logic here and delete this line
 
-	return
+	return nil
 }

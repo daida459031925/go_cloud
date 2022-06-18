@@ -9,20 +9,20 @@ import (
 	"service/userService/api/internal/types"
 )
 
-func login1Handler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func refreshHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.LoginReq
+		var req types.NewToken
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.Error(w, err)
 			return
 		}
 
-		l := logic.NewLogin1Logic(r.Context(), svcCtx)
-		resp, err := l.Login1(req)
+		l := logic.NewRefreshLogic(r.Context(), svcCtx)
+		err := l.Refresh(req)
 		if err != nil {
 			httpx.Error(w, err)
 		} else {
-			httpx.OkJson(w, resp)
+			httpx.Ok(w)
 		}
 	}
 }

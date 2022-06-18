@@ -1,3 +1,18 @@
 Name: user-api
 Host: 0.0.0.0
 Port: 8888
+Mysql:
+  DataSource: root:MYSQL@tcp(192.168.0.100:3306)/go_cloud?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+CacheRedis:
+  - Host: 192.168.0.100:6379
+    pass:
+    Type: node
+Auth:
+  #单位秒
+  AccessExpire: 420
+  AccessSecret: asdsadsdasdasdasdasdasd
+#UserRpc:
+#  Etcd:
+#    Hosts:
+#      - 192.168.0.100:2379
+#    key: user.rpc
