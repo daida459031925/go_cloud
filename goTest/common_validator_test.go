@@ -28,10 +28,43 @@ type Social1 struct {
 }
 
 func TestValidatorPast(t *testing.T) {
-	//user := &User1{
-	//	Name:    "",
-	//	Age:     0,
-	//	Social1: Social{},
+	validate = validator.New() //初始化（赋值）
+	validateStruct()           //结构体校验
+	validateVariable()         //变量校验
+
+	user := &User1{
+		Name:    "代打",
+		Age:     0,
+		Social1: Social{},
+	}
+	validate := validator.New() //初始化（赋值）
+	err := validate.Struct(user)
+	if err != nil {
+
+		for _, e := range err.(validator.ValidationErrors) {
+			fmt.Println("Namespace:", e.Namespace())
+			fmt.Println("Field:", e.Field())
+			fmt.Println("StructNamespace:", e.StructNamespace())
+			fmt.Println("StructField:", e.StructField())
+			fmt.Println("Tag:", e.Tag())
+			fmt.Println("ActualTag:", e.ActualTag())
+			fmt.Println("Kind:", e.Kind())
+			fmt.Println("Type:", e.Type())
+			fmt.Println("Value:", e.Value())
+			fmt.Println("Param:", e.Param())
+			fmt.Println()
+		}
+
+		fmt.Println("*", err)
+	}
+
+	//zhCh := zh.New()
+	//uni := ut.New(zhCh)                 // 万能翻译器，保存所有的语言环境和翻译数据
+	//trans, _ := uni.GetTranslator("zh") // 翻译器
+	//var str = "one"
+	//err := trans.Add(str, "{0} 为必填字段!", true)
+	//if err == nil {
+	//	return
 	//}
 	//validate := validator.New() //初始化（赋值）
 	//err := validate.Struct(user)
@@ -187,4 +220,67 @@ func removeStructName(fields map[string]string) map[string]string {
 		result[field[strings.Index(field, ".")+1:]] = e
 	}
 	return result
+}
+
+func validateStruct() {
+	var validate *validator.Validate //定义
+
+	type Address struct {
+		Province string `validate:"required"`       //非空
+		City     string `validate:"required"`       //非空
+		Phone    string `validate:"numeric,len=11"` //数字类型，长度为11
+	}
+
+	type User struct {
+		Name  string `validate:"required"`       //非空
+		Age   uint8  `validate:"gte=0,lte=130"`  //  0<=Age<=130
+		Email string `validate:"required,email"` //非空，email格式
+		//dive关键字代表 进入到嵌套结构体进行判断
+		Address []*Address `validate:"dive"` //  可以拥有多个地址
+	}
+
+	address := Address{
+		Province: "重庆",
+		City:     "重庆",
+		Phone:    "13366663333x",
+	}
+	user := User{
+		Name:    "江洲",
+		Age:     23,
+		Email:   "jz@163.com",
+		Address: []*Address{&address},
+	}
+	err := validate.Struct(user)
+	if err != nil {
+		//断言为：validator.ValidationErrors，类型为：[]FieldError
+		for _, e := range err.(validator.ValidationErrors) {
+			fmt.Println("Namespace:", e.Namespace())
+			fmt.Println("Field:", e.Field())
+			fmt.Println("StructNamespace:", e.StructNamespace())
+			fmt.Println("StructField:", e.StructField())
+			fmt.Println("Tag:", e.Tag())
+			fmt.Println("ActualTag:", e.ActualTag())
+			fmt.Println("Kind:", e.Kind())
+			fmt.Println("Type:", e.Type())
+			fmt.Println("Value:", e.Value())
+			fmt.Println("Param:", e.Param())
+			fmt.Println()
+		}
+
+		fmt.Println("结构体输入数据类型错误！")
+		return
+	} else {
+		fmt.Println("结构体校验通过")
+	}
+}
+
+// 变量校验
+func validateVariable() {
+	myEmail := "123@qq.com" //邮箱地址：xx@xx.com
+	err := validate.Var(myEmail, "required,email")
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("变量校验通过！")
+	}
 }

@@ -3,13 +3,12 @@ module github.com/daida459031925/go_cloud/goTest
 go 1.19
 
 require (
-	github.com/daida459031925/common v0.0.0-20220630003141-5469964aea58
+	github.com/daida459031925/common v0.0.0-20220702024046-8180246ee1b2
 	github.com/go-playground/locales v0.14.0
 	github.com/go-playground/universal-translator v0.18.0
 	github.com/go-playground/validator/v10 v10.11.0
 	github.com/gogf/gf v1.16.6
 	github.com/golang-jwt/jwt/v4 v4.2.0
-	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.7.0
 	github.com/zeromicro/go-zero v1.3.2
 	golang.org/x/text v0.3.7
