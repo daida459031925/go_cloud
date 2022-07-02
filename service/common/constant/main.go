@@ -31,4 +31,8 @@ const (
 
 	//业务数据内容
 	LogicLog = 5
+
+	//I18n语言内容
+	I18N_EN = "en"
+	I18N_ZH = "zh"
 )
