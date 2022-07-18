@@ -3,11 +3,13 @@ module service
 go 1.19
 
 require (
-	github.com/daida459031925/common v0.0.0-20220614090046-a11e274795a4
+	github.com/daida459031925/common v0.0.0-20220630003141-5469964aea58
+	github.com/go-playground/validator/v10 v10.11.0
 	github.com/golang-jwt/jwt/v4 v4.4.1
 	github.com/pkg/errors v0.9.1
 	github.com/zeromicro/go-zero v1.3.4
 	golang.org/x/net v0.0.0-20220421235706-1d1ef9303861
+	golang.org/x/text v0.3.7
 	google.golang.org/grpc v1.46.2
 	google.golang.org/protobuf v1.28.0
 )
@@ -22,6 +24,8 @@ require (
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/go-playground/locales v0.14.0 // indirect
+	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
@@ -33,6 +37,7 @@ require (
 	github.com/googleapis/gnostic v0.5.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/justinas/alice v1.2.0 // indirect
+	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-colorable v0.1.9 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
@@ -57,10 +62,10 @@ require (
 	go.uber.org/automaxprocs v1.5.1 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
+	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f // indirect
 	golang.org/x/sys v0.0.0-20220429233432-b5fbb4746d32 // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
-	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220411224347-583f2d630306 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20220422154200-b37d22cd5731 // indirect

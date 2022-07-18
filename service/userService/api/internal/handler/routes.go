@@ -19,13 +19,63 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodPost,
+				Path:    "/user/refresh",
+				Handler: refreshHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
 				Path:    "/user/logout",
 				Handler: logoutHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
-				Path:    "/user/refresh",
-				Handler: refreshHandler(serverCtx),
+				Path:    "/user/find",
+				Handler: find_oneHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/user/add",
+				Handler: addHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/user/upd",
+				Handler: updHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/user/del",
+				Handler: delHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/user/adds",
+				Handler: addsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/user/upds",
+				Handler: updsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/user/dels",
+				Handler: delsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/user/part/adds",
+				Handler: part_addsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/user/part/upds",
+				Handler: part_updsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/user/part/dels",
+				Handler: part_delsHandler(serverCtx),
 			},
 		},
 	)

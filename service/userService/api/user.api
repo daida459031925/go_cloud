@@ -1,60 +1,116 @@
 syntax = "v1"
 
 info(
-	title: "type title here"
-	desc: "type desc here"
-	author: "type author here"
-	email: "type email here"
-	version: "type version here"
+	title: "用户基本操作api"
+	desc: "用户Token,CRUD,"
+	author: "戴达"
+	email: "daida459031925@163.com"
+	version: "0.0.1"
 )
 
+//中文英文特殊字符限制目前没有找到合适方法进行限制
+
 type (
-	Login {
-		Username string `json:"username" form:"username" validate:"required"`
-		Password string `json:"password" form:"password" validate:`
+	Login { //登录使用 目前缺少验证码
+		Username string `json:"username" form:"username" validate:"required,min=8,max=30"`
+		Password string `json:"password" form:"password" validate:"required,min=8,max=30"`
 	}
 
-	UserToken {
+	logoutUserToken { //登出
+		Id int64 `json:"id" form:"id"`
+	}
+
+	RUserToken { //返还对应json数据 使用jwt技术用来保证用户
 		Id           int64  `json:"id"`
-		Name         string `json:"name,optional"`
-		Gender       string `json:"gender,optional"`
+		Name         string `json:"name"`
+		Gender       string `json:"gender"`
 		AccessToken  string `json:"accessToken"`
 		AccessExpire int64  `json:"accessExpire"`
 		RefreshAfter int64  `json:"refreshAfter"`
 	}
 
-	SysUser struct {
-		Id          uint64          `json:"id"`          // 唯一主键id
-		Account     string `json:"account"`     // 账号
-		Password    string `json:"password"`    // 密码
-		Gender      int  `json:"gender,default=0,options=0|1|2"`      // 性别（男|女|未知）
+	AddDBSysUser { //添加用户参数
+		Deleted         int    `json:"deleted,default=1" form:"deleted,default=1"`                                               // 标识是否删除1存在 2删除
+		Account         string `json:"account" form:"account" validate:"required,min=8,max=30"`                                  // 账号
+		Password        string `json:"password" form:"password" validate:"required,min=8,max=30,eqfield=comparePassword"`        // 密码
+		ComparePassword string `json:"comparePassword" form:"comparePassword" validate:"required,min=8,max=30,eqfield=password"` // 密码
+		Gender          int    `json:"gender,default=0,options=0|1|2" form:"gender,default=0,options=0|1|2"`                     // 性别（未知|男|女）
+		TokenExpire     int    `json:"tokenExpire" form:"tokenExpire"`                                                           // token时间 单位秒
 	}
 
-	ReturnSysUser struct {
-		Id          uint64          `json:"id"`          // 唯一主键id
-		Account     string `json:"account"`     // 账号
-		Gender      int  `json:"gender,default=0,options=0|1|2"`      // 性别（男|女|未知）
-		CreateTime  sql.NullTime   `json:"createTime,optional"`  // 创建时间
-		UpdateTime  sql.NullTime   `json:"updateTime,optional"`  // 最后更新时间
-		CreateBy    uint64 `json:"createBy"`    // 创建人
-		UpdateBy    uint64 `json:"updateBy"`    // 最后更新人
+	UpdDBSysUser { //更新用户对象
+		Id              uint64 `json:"id" form:"id"`                                                                             // 唯一主键id
+		Deleted         int    `json:"deleted" form:"deleted"`                                                                   // 标识是否删除1存在 2删除
+		Password        string `json:"password" form:"password" validate:"required,min=8,max=30,eqfield=comparePassword"`        // 密码
+		ComparePassword string `json:"comparePassword" form:"comparePassword" validate:"required,min=8,max=30,eqfield=password"` // 密码
+		Gender          int    `json:"gender,default=0,options=0|1|2" form:"gender,default=0,options=0|1|2"`                     // 性别（未知|男|女）
+		TokenExpire     int    `json:"tokenExpire" form:"tokenExpire"`                                                           // token时间 单位秒
+	}
+
+	RSysUser { // 返还用户对象用于展示
+		Id             uint64 `json:"id"`             // 唯一主键id
+		Type           int    `json:"type"`           // 类型，用于区分用户加入来源：1.手动添加，2批量添加，3微信注册，4pc注册 5，同步,
+		Account        string `json:"account"`        // 账号
+		Gender         int    `json:"gender"`         // 性别（未知|男|女）
+		CreateTime     string `json:"createTime"`     // 创建时间
+		UpdateTime     string `json:"updateTime"`     // 最后更新时间
+		CreateBy       uint64 `json:"createBy"`       // 创建人
+		UpdateBy       uint64 `json:"updateBy"`       // 最后更新人
+		CreateByUserId uint64 `json:"createByUserId"` // 为了查询用户，保存id，空间换时间的备用,
+		UpdateByUserId uint64 `json:"updateByUserId"` // 为了查询用户，保存id，空间换时间的备用,
 	}
 )
 
+//不管返还什么内容，都必须使用resp result.Result 进行封装 api永远返回200 参数中添加code 200 500错误
+@server (
+	middleware: Example // 路由中间件声明
+)//参数验证
 service user-api {
 	//登录
 	@handler login
-	post /user/login (Login) returns (UserToken)
+	post /user/login (Login) returns (RUserToken)
+}
+
+@server (
+	jwt: Auth,
+	middleware: Example // 路由中间件声明
+)
+service user-api {
 	//退出
 	@handler logout
-	post /user/logout (UserToken) returns ()
+	post /user/logout (logoutUserToken) returns ()
+
 	//刷新token
 	@handler refresh
-	post /user/refresh (UserToken) returns(UserToken)
-	//添加用户
+	post /user/refresh (RUserToken) returns ()
+
+
+	//查询单个
+	@handler find_one
+	post /user/find (UpdDBSysUser) returns (RSysUser)
+
+	//普通crud
 	@handler add
-	post /user/add (SysUser) returns(ReturnSysUser)
+	post /user/add (AddDBSysUser) returns (RSysUser)
 	@handler upd
-	post /user/upd (SysUser) returns(ReturnSysUser)
+	post /user/upd (UpdDBSysUser) returns (RSysUser)
+	@handler del
+	post /user/del (UpdDBSysUser) returns (RSysUser)
+
+	//需要自定义参数以及返还值 批量必须全部成功
+	@handler adds
+	post /user/adds () returns ()
+	@handler upds
+	post /user/upds () returns ()
+	@handler dels
+	post /user/dels () returns ()
+
+	//需要自定义参数以及返还值 批量错误不加
+	@handler part_adds
+	post /user/part/adds () returns ()
+	@handler part_upds
+	post /user/part/upds () returns ()
+	@handler part_dels
+	post /user/part/dels () returns ()
 
 }

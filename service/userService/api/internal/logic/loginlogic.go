@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"fmt"
+	"github.com/daida459031925/common/result"
 	"github.com/zeromicro/go-zero/core/logx"
 	"golang.org/x/net/html/atom"
 	"service/userService/api/internal/svc"
@@ -23,7 +24,7 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) LoginLogic {
 	}
 }
 
-func (l *LoginLogic) Login(req types.Login) (*types.UserToken, error) /*(resp result.Result)*/ {
+func (l *LoginLogic) Login(req types.Login) (resp result.Result) {
 	// todo: add your logic here and delete this line
 	//if len(strings.TrimSpace(req.Username)) == 0 || len(strings.TrimSpace(req.Password)) == 0 {
 	//	return result.Error("参数错误")
@@ -60,14 +61,13 @@ func (l *LoginLogic) Login(req types.Login) (*types.UserToken, error) /*(resp re
 	//	return nil, err
 	//}
 	// ---end---
-
-	return &types.UserToken{
+	ru := &types.RUserToken{
 		//Id:           userInfo.Id,
 		//Name:         userInfo.Name,
 		//Gender:       userInfo.Gender,
 		//AccessToken:  jwtToken,
 		//AccessExpire: now + accessExpire,
 		//RefreshAfter: now + accessExpire/2,
-	}, nil
-	//return result.Ok(nil)
+	}
+	return result.Ok(ru)
 }
