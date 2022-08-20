@@ -23,7 +23,7 @@ func NewLogoutLogic(ctx context.Context, svcCtx *svc.ServiceContext) LogoutLogic
 	}
 }
 
-func (l *LogoutLogic) Logout(req types.UserToken) error {
+func (l *LogoutLogic) Logout(req types.RUserToken) error {
 	// todo: add your logic here and delete this line
 
 	return nil

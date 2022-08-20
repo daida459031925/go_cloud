@@ -2,13 +2,13 @@ package svc
 
 import (
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
-	"service/userService/model"
+	sysImpl "service/common/generalSql/impl/sys"
 	"service/userService/rpc/internal/config"
 )
 
 type ServiceContext struct {
-	Config    config.Config
-	UserModel model.SysUserModel
+	Config       config.Config
+	SysUserModel sysImpl.SysUserImpl
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -17,6 +17,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
 		Config: c,
 		//初始化缓存
-		UserModel: model.NewSysUserModel(conn, c.CacheRedis),
+		SysUserModel: sysImpl.GetSysUserModel(conn, c.CacheRedis),
 	}
 }

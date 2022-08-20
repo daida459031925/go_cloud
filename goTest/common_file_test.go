@@ -2,7 +2,8 @@ package goTest
 
 import (
 	"fmt"
-	"github.com/gogf/gf/os/gfile"
+	"github.com/gogf/gf/v2/os/gfile"
+	"github.com/zeromicro/go-zero/core/logx"
 	"net/http"
 	"testing"
 )
@@ -19,9 +20,11 @@ func TestFile(t *testing.T) {
 	fmt.Println(file.Name())
 	bytes := gfile.GetBytesByTwoOffsetsByPath(path, 0, 10)
 	fmt.Println(bytes)
+
+	logx.Info("eeee")
 }
 
-//path为本地文件路劲
+// path为本地文件路劲
 func play(path string, httpreq *http.Request, httpres *http.Response) {
 	//file, err := gfile.Open("")
 	//

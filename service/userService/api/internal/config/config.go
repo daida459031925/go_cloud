@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/rest"
+	"github.com/zeromicro/go-zero/zrpc"
 )
 
 type Config struct {
@@ -19,5 +20,5 @@ type Config struct {
 	//缓存
 	CacheRedis cache.CacheConf
 	//内部服务调用
-	//UserRpc zrpc.RpcClientConf
+	UserRpc zrpc.RpcClientConf
 }

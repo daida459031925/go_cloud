@@ -8,6 +8,7 @@ import (
 	"golang.org/x/net/html/atom"
 	"service/userService/api/internal/svc"
 	"service/userService/api/internal/types"
+	"service/userService/rpc/user"
 )
 
 type LoginLogic struct {
@@ -29,12 +30,21 @@ func (l *LoginLogic) Login(req types.Login) (resp result.Result) {
 	//if len(strings.TrimSpace(req.Username)) == 0 || len(strings.TrimSpace(req.Password)) == 0 {
 	//	return result.Error("参数错误")
 	//}
+	var i uint64 = 1
+	var u user.IdReq
+	u.Id = i
+	fmt.Println(u)
+	u1, e := l.svcCtx.UserRpc.GetUser(l.ctx, &u)
+	if e != nil {
+		return nil, e
+	}
+	fmt.Println(u1)
 
 	atom.Time.String()
 	a, b := 1, 0
 	fmt.Println(a / b)
 
-	userInfo, err := l.svcCtx.UserModel.FindOne(1)
+	userInfo, err := l.svcCtx.SysUserModel.FindOne(1)
 	fmt.Println(userInfo)
 	fmt.Println(err)
 	//switch err {

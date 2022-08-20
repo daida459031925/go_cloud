@@ -23,7 +23,7 @@ func NewRefreshLogic(ctx context.Context, svcCtx *svc.ServiceContext) RefreshLog
 	}
 }
 
-func (l *RefreshLogic) Refresh(req types.NewToken) error {
+func (l *RefreshLogic) Refresh(req types.RNewToken) error {
 	// todo: add your logic here and delete this line
 
 	return nil

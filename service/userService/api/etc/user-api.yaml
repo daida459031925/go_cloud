@@ -11,8 +11,9 @@ Auth:
   #单位秒
   AccessExpire: 420
   AccessSecret: asdsadsdasdasdasdasdasd
-#UserRpc:
-#  Etcd:
-#    Hosts:
-#      - 192.168.0.100:2379
-#    key: user.rpc
+UserRpc:
+  Etcd:
+    Hosts:
+      - 192.168.0.100:23791
+    #注意大写K
+    Key: user.rpc

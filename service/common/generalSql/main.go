@@ -17,27 +17,27 @@ import (
 // 根据拿到的key 和 value 进行sql语句动态执行
 type (
 	//通用泛型接口可以从数据库基础信息传入 相当于初始化时候设置类型
-	defaultModel[T any] struct {
+	DefaultModel[T any] struct {
 		/*-----------数据库相关---------------*/
 
 		//数据库连接
 		sqlc.CachedConn
 		//目的是为了解决通用批量问题
-		sqlcon sqlx.SqlConn
+		Sqlcon sqlx.SqlConn
 		//表名
-		table string
+		Table string
 		//当前表全部信息
-		fieldNames []string
+		FieldNames []string
 		//将数组的key 编程字符串的key
-		fieldNameRows string
+		FieldNameRows string
 		/*-----------缓存相关---------------*/
 
 		//缓存key "cache:sysUser:id:"
-		cacheIdPrefix string
+		CacheIdPrefix string
 
 		/*-----------错误相关---------------*/
 		//错误类
-		errNotFound error
+		ErrNotFound error
 
 		//下面是需要删除的字段
 		//sysUserRowsExpectAutoSet   = strings.Join(stringx.Remove(sysUserFieldNames, "`id`", "`create_time`", "`update_time`"), ",")
@@ -59,23 +59,23 @@ type (
 )
 
 // 创建时候指定类型
-func CreateModel[T any](conn sqlx.SqlConn, c cache.CacheConf, table string) TkMybatisModel {
+func CreateModel[T any](conn sqlx.SqlConn, c cache.CacheConf, table string) *DefaultModel[T] {
 	var t T
 	query := builder.RawFieldNames(t)
-	return &defaultModel[T]{
+	return &DefaultModel[T]{
 		CachedConn:    sqlc.NewConn(conn, c),
-		sqlcon:        conn,
-		table:         table,
-		cacheIdPrefix: fmt.Sprintf("cache:%s:id:", table),
-		errNotFound:   sqlx.ErrNotFound,
-		fieldNames:    query,
-		fieldNameRows: strings.Join(query, ","),
+		Sqlcon:        conn,
+		Table:         table,
+		CacheIdPrefix: fmt.Sprintf("cache:%s:id:", table),
+		ErrNotFound:   sqlx.ErrNotFound,
+		FieldNames:    query,
+		FieldNameRows: strings.Join(query, ","),
 	}
 }
 
 //通用化crud完成
 
-func (d *defaultModel[T]) Insert(data any) (sql.Result, error) {
+func (d *DefaultModel[T]) Insert(data any) (sql.Result, error) {
 	//获取可以传入的key
 	var key string
 	var value []interface{}
@@ -100,19 +100,19 @@ func (d *defaultModel[T]) Insert(data any) (sql.Result, error) {
 
 	v := strings.Join(valueDataString, ",")
 
-	query := fmt.Sprintf("insert into %s (%s) values (%s)", d.table, key, v)
+	query := fmt.Sprintf("insert into %s (%s) values (%s)", d.Table, key, v)
 	ret, err := d.ExecNoCache(query, value...)
 
 	return ret, err
 }
 
 // 需要添加查询什么内容，例如我要查询user
-func (d *defaultModel[T]) FindOne(id uint64) (any, error) {
-	idKey := fmt.Sprintf("%s%v", d.cacheIdPrefix, id)
+func (d *DefaultModel[T]) FindOne(id uint64) (any, error) {
+	idKey := fmt.Sprintf("%s%v", d.CacheIdPrefix, id)
 	var resp T
 
 	err := d.QueryRow(&resp, idKey, func(conn sqlx.SqlConn, v interface{}) error {
-		query := fmt.Sprintf("select %s from %s where `id` = ? limit 1", d.fieldNameRows, d.table)
+		query := fmt.Sprintf("select %s from %s where `id` = ? limit 1", d.FieldNameRows, d.Table)
 		//要想动态传入参数，需要将 args := []interface{}{id} 这样的对象   然后 使用 args... 作为参数传入才能正常执行sql
 		//sql的?的个数必须与args相当 这就说明现在要做的是数据 解析器和 sql语句 问号生成器
 		args := []interface{}{id}
@@ -122,14 +122,14 @@ func (d *defaultModel[T]) FindOne(id uint64) (any, error) {
 	case nil:
 		return &resp, nil
 	case sqlc.ErrNotFound:
-		return nil, d.errNotFound
+		return nil, d.ErrNotFound
 	default:
 		return nil, err
 	}
 }
 
 // 通过仔细思考更新时候必须强行代入id，防止数据修改错误
-func (d *defaultModel[T]) Update(data any, id uint64) error {
+func (d *DefaultModel[T]) Update(data any, id uint64) error {
 	//sysUserRowsWithPlaceHolder = strings.Join(stringx.Remove(sysUserFieldNames, "`id`", "`create_time`", "`update_time`"), "=?,") + "=?"
 
 	//获取可以传入的key
@@ -153,18 +153,18 @@ func (d *defaultModel[T]) Update(data any, id uint64) error {
 
 	value = append(value, id)
 
-	idKey := fmt.Sprintf("%s%v", d.cacheIdPrefix, id)
+	idKey := fmt.Sprintf("%s%v", d.CacheIdPrefix, id)
 	_, err = d.Exec(func(conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("update %s set %s where `id` = ?", d.table, key)
+		query := fmt.Sprintf("update %s set %s where `id` = ?", d.Table, key)
 		return conn.Exec(query, value...)
 	}, idKey)
 	return err
 }
 
-func (d *defaultModel[T]) Delete(id uint64) error {
-	idKey := fmt.Sprintf("%s%v", d.cacheIdPrefix, id)
+func (d *DefaultModel[T]) Delete(id uint64) error {
+	idKey := fmt.Sprintf("%s%v", d.CacheIdPrefix, id)
 	_, err := d.Exec(func(conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("delete from %s where `id` = ?", d.table)
+		query := fmt.Sprintf("delete from %s where `id` = ?", d.Table)
 		return conn.Exec(query, id)
 	}, idKey)
 	return err
@@ -172,7 +172,7 @@ func (d *defaultModel[T]) Delete(id uint64) error {
 
 //批量的crud
 
-func (d *defaultModel[T]) InsertList(datas []any) (uint64, error) {
+func (d *DefaultModel[T]) InsertList(datas []any) (uint64, error) {
 	//使用最简单方式实现
 	var value = make([]string, 0)
 	keys, err := rsql.RawField(datas[0], 3)
@@ -185,9 +185,9 @@ func (d *defaultModel[T]) InsertList(datas []any) (uint64, error) {
 	}
 
 	var insertsql = fmt.Sprintf(`insert into %s(%s) values (%s)`,
-		d.table, strings.Join(keys, ","), strings.Join(value, ","))
+		d.Table, strings.Join(keys, ","), strings.Join(value, ","))
 
-	bulkInserter, err := sqlx.NewBulkInserter(d.sqlcon, insertsql)
+	bulkInserter, err := sqlx.NewBulkInserter(d.Sqlcon, insertsql)
 	if err != nil {
 		return 0, errors.New("批量添加，连接错误错误")
 	}
@@ -223,7 +223,7 @@ func (d *defaultModel[T]) InsertList(datas []any) (uint64, error) {
 	return reurnList, nil
 }
 
-func (d *defaultModel[T]) FindList() (any, error) {
+func (d *DefaultModel[T]) FindList() (any, error) {
 	//sqlx.NewBulkInserter()
 	//for i := range datas {
 	//	//开启事务 Transact() 都会自动回滚事务
@@ -327,7 +327,7 @@ func (d *defaultModel[T]) FindList() (any, error) {
 	return nil, nil
 }
 
-func (d *defaultModel[T]) UpdateList(datas []any) error {
+func (d *DefaultModel[T]) UpdateList(datas []any) error {
 	//sqlx.NewBulkInserter()
 	//for i := range datas {
 	//	//开启事务 Transact() 都会自动回滚事务
@@ -431,30 +431,30 @@ func (d *defaultModel[T]) UpdateList(datas []any) error {
 }
 
 // 批量删除数据库数据，同时删除缓存
-func (d *defaultModel[T]) DeleteList(ids []uint64) error {
+func (d *DefaultModel[T]) DeleteList(ids []uint64) error {
 	var idkeys []string
 	var idvalues []string
 	var args []interface{}
 	for i := range ids {
-		idkeys = append(idkeys, fmt.Sprintf("%s%v", d.cacheIdPrefix, ids[i]))
+		idkeys = append(idkeys, fmt.Sprintf("%s%v", d.CacheIdPrefix, ids[i]))
 		args = append(args, ids[i])
 		idvalues = append(idvalues, strconv.FormatUint(ids[i], 10))
 	}
 
 	_, err := d.Exec(func(conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("delete from %s where `id` in (%s)", d.table, strings.Join(idvalues, ","))
+		query := fmt.Sprintf("delete from %s where `id` in (%s)", d.Table, strings.Join(idvalues, ","))
 		return conn.Exec(query, args...)
 	}, idkeys...)
 	return err
 }
 
 // 获取缓存key字符串
-func (d *defaultModel[T]) formatPrimary(primary interface{}) string {
-	return fmt.Sprintf("%s%v", d.cacheIdPrefix, primary)
+func (d *DefaultModel[T]) formatPrimary(primary interface{}) string {
+	return fmt.Sprintf("%s%v", d.CacheIdPrefix, primary)
 }
 
 // 根据主键查询查看是否存在数据库中
-func (d *defaultModel[T]) queryPrimary(conn sqlx.SqlConn, v, primary interface{}) error {
-	query := fmt.Sprintf("select %s from %s where `id` = ? limit 1", d.fieldNameRows, d.table)
+func (d *DefaultModel[T]) queryPrimary(conn sqlx.SqlConn, v, primary interface{}) error {
+	query := fmt.Sprintf("select %s from %s where `id` = ? limit 1", d.FieldNameRows, d.Table)
 	return conn.QueryRow(v, query, primary)
 }

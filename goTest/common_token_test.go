@@ -75,7 +75,7 @@ func TestTokenParser_Expired(t *testing.T) {
 	req.Header.Set("Authorization", "Bearer "+token)
 
 	req1 := httptest.NewRequest(http.MethodGet, "http://localhost", nil)
-	token1, err1 := buildToken(key, map[string]interface{}{
+	token1, err1 := buildToken(prevKey, map[string]interface{}{
 		"key":  "value",
 		"time": "2022-04-22 00:00:00",
 	}, 50000)
@@ -93,8 +93,8 @@ func TestTokenParser_Expired(t *testing.T) {
 	parser := token2.NewTokenParser(token2.WithResetDuration(time.Second))
 
 	//解析token
-	tok, err := parser.ParseToken(req, key, prevKey)
-	tok1, err1 := parser.ParseToken(req1, key, prevKey)
+	tok, err := parser.ParseToken(req, key, "")
+	tok1, err1 := parser.ParseToken(req1, "", prevKey)
 
 	if err != nil {
 		logx.Info("tonken 获取失败", err)

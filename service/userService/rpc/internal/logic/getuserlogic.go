@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"service/common/generalSql/model/sys"
 	"service/userService/rpc/types/user"
 
 	"service/userService/rpc/internal/svc"
@@ -25,13 +26,19 @@ func NewGetUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUserLo
 
 func (l *GetUserLogic) GetUser(in *user.IdReq) (*user.UserInfoReply, error) {
 	// todo: add your logic here and delete this line
-	User, err := l.svcCtx.UserModel.FindOne(in.Id)
-	if err != nil {
-		return nil, err
+	User, e := l.svcCtx.SysUserModel.FindOneAndDeleted(in.Id)
+	if e != nil {
+		return nil, e
+	}
+
+	var u, e1 = User.(sys.SysUser)
+
+	if e1 {
+		return nil, e
 	}
 
 	return &user.UserInfoReply{
-		Id: User.Id,
+		Id: u.Id,
 		//Name:   User.Name,
 		//Number: User.Number,
 		//Gender: User.Gender,
