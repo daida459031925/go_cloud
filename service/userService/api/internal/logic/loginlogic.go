@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/daida459031925/common/result"
 	"github.com/zeromicro/go-zero/core/logx"
+	"gocv.io/x/gocv"
 	"golang.org/x/net/html/atom"
 	"service/userService/api/internal/svc"
 	"service/userService/api/internal/types"
@@ -26,6 +27,8 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) LoginLogic {
 }
 
 func (l *LoginLogic) Login(req types.Login) (resp result.Result) {
+	fmt.Printf("gocv version: %s\n", gocv.Version())
+	fmt.Printf("opencv lib version: %s\n", gocv.OpenCVVersion())
 	// todo: add your logic here and delete this line
 	//if len(strings.TrimSpace(req.Username)) == 0 || len(strings.TrimSpace(req.Password)) == 0 {
 	//	return result.Error("参数错误")

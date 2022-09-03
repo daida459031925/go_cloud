@@ -15,6 +15,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/yitter/idgenerator-go v1.3.1
 	github.com/zeromicro/go-zero v1.4.0
+	gocv.io/x/gocv v0.31.0
 	golang.org/x/text v0.3.8-0.20211105212822-18b340fc7af2
 )
 
