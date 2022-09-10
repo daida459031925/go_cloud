@@ -9,16 +9,16 @@ import (
 	"gocv.io/x/gocv"
 	"image"
 	"image/color"
-	"math"
 	"reflect"
+	"strings"
 	"testing"
 )
 
 type (
 	face struct {
-		imgFace     gocv.Mat               //需要检测的人脸原始照片 裁剪
-		imgCropFace gocv.Mat               //裁剪成人脸的照片
-		classifier  gocv.CascadeClassifier //加载人脸分类器xml对象
+		imgFace     gocv.Mat                 //需要检测的人脸原始照片 裁剪
+		imgCropFace gocv.Mat                 //裁剪成人脸的照片
+		classifier  []gocv.CascadeClassifier //加载分类器xml对象
 		closeStruct
 	}
 
@@ -37,6 +37,11 @@ type (
 	popBack struct {
 	}
 )
+
+// 初始化face struct
+func NewFace() face {
+	return face{closeStruct: closeStruct{glist.New()}}
+}
 
 // 为了减少重复代码编写以及维护难度提高方法只写一处，执行方法使用pop组合对象方式减少代码重复度
 func execute(g *glist.List, p pop) {
@@ -77,19 +82,39 @@ func (popBack) getFunc(l *glist.List) interface{} {
 	return l.PopBack()
 }
 
-func loadFile(faceXml string, imageFace string) {
+// 加载分类器，目前包括人脸，人眼
+// haarcascade_frontalface_alt.xml haarcascade_eye_tree_eyeglasses.xml
+func (f face) loadFaceXmlFile(xml ...string) {
+	fx.From(func(source chan<- interface{}) {
+		if xml != nil && len(xml) > 0 {
+			for i := range xml {
+				source <- strings.TrimSpace(xml[i])
+			}
+		}
+	}).Distinct(func(item interface{}) interface{} {
+		s := item.(string)
+		return s
+	}).ForEach(func(item interface{}) {
+		s := item.(string)
+		logx.Info(s)
+		if len(s) > 0 {
+			classifier := gocv.NewCascadeClassifier()
+			if !classifier.Load(s) {
+				logx.Errorf("load %s fail", s)
+				_ = classifier.Close()
+				return
+			}
+			f.classifier = append(f.classifier, classifier)
+			f.closeList.PushBack(classifier.Close())
+		}
+	})
+}
+
+func a(a gocv.CascadeClassifier) {
 
 }
 
 func TestInit(t *testing.T) {
-	//webcam, _ := gocv.VideoCaptureDevice(0)
-	//window := gocv.NewWindow("Hello")
-	//img := gocv.NewMat()
-	//for {
-	//	webcam.Read(&img)
-	//	window.IMShow(img)
-	//	window.WaitKey(1)
-	//}
 	faceXml := "D:\\opencv\\sources\\data\\haarcascades\\haarcascade_frontalface_alt.xml"
 	imageFace := "C:\\Users\\daida\\Desktop\\src=http___n.sinaimg.cn_sinacn10_309_w534h575_20180926_a837-hhuhisn1021919.jpg&refer=http___n.sinaimg.jpg"
 	//imageFace := "C:\\Users\\daida\\go\\pkg\\mod\\gocv.io\\x\\gocv@v0.31.0\\images\\aruco_6X6_250_6.png"
@@ -111,10 +136,6 @@ func TestInit(t *testing.T) {
 	}
 	logx.Infof("检测到 %d 个人脸", faces)
 
-	// open display window
-	//window := gocv.NewWindow("Face Detect")
-	//defer window.Close()
-
 	// color for the rect when faces detected
 	blue := color.RGBA{0, 0, 255, 0}
 
@@ -125,14 +146,6 @@ func TestInit(t *testing.T) {
 		pt := image.Pt(face.Min.X+(face.Min.X/2)-(size.X/2), face.Min.Y-2)
 		gocv.PutText(&img, "Human", pt, gocv.FontHersheyPlain, 1.2, blue, 2)
 	}
-
-	// show the image in the window, and wait 1 millisecond
-	//window.IMShow(img)
-	//for {
-	//	if window.WaitKey(1) >= 0 {
-	//		break
-	//	}
-	//}
 
 }
 
@@ -249,7 +262,8 @@ func TestFaceCutOut(t *testing.T) {
 	classifier.Load(faceXml)
 
 	//加载需要读取的图片资源
-	imageFace := "C:\\Users\\daida\\Desktop\\14EA0B1FBEB616B217BBCA8B85462C9E.jpg"
+	//imageFace := "C:\\Users\\daida\\Desktop\\14EA0B1FBEB616B217BBCA8B85462C9E.jpg"
+	imageFace := "C:\\Users\\daida\\Desktop\\WIN_20220903_18_50_18_Pro.jpg"
 	img := gocv.IMRead(imageFace, gocv.IMReadUnchanged)
 
 	//检查是否有人脸
@@ -269,7 +283,7 @@ func TestFaceCutOut(t *testing.T) {
 	window := gocv.NewWindow("Face Detect")
 	defer window.Close()
 	//设置大小并计算画面大小二项坐标 坐标点A（左上）,B（右下）；X的差值 Y的差值
-	window.ResizeWindow(math.Abs(face.Max.X-face.Min.X), face.Max.Y-face.Min.Y)
+	window.ResizeWindow( /*math.Abs(face.Max.X-face.Min.X)*/ face.Max.X-face.Min.X, face.Max.Y-face.Min.Y)
 	window.IMShow(croppedMat)
 	//防止程序关闭 按esc关闭
 	for {
@@ -277,4 +291,82 @@ func TestFaceCutOut(t *testing.T) {
 			break
 		}
 	}
+}
+
+// 笔记本摄像头人脸检测
+func TestFaceCamera(t *testing.T) {
+	faceXml := "D:\\opencv\\sources\\data\\haarcascades\\haarcascade_frontalface_alt.xml"
+	eyeXml := "D:\\opencv\\sources\\data\\haarcascades\\haarcascade_eye_tree_eyeglasses.xml"
+	classifier := gocv.NewCascadeClassifier()
+	defer classifier.Close()
+	//load classifier to recognize faces
+	if !classifier.Load(faceXml) {
+		logx.Error("faceXml load err")
+		exit()
+	}
+
+	eyeclassifier := gocv.NewCascadeClassifier()
+	defer eyeclassifier.Close()
+	//load classifier to recognize faces
+	if !eyeclassifier.Load(eyeXml) {
+		logx.Error("eyeXml load err")
+		exit()
+	}
+
+	webcam, _ := gocv.VideoCaptureDevice(0)
+	// open display window
+	window := gocv.NewWindow("Face Detect")
+	defer window.Close()
+
+	// color for the rect when faces detected
+	blue := color.RGBA{0, 0, 255, 0}
+	img := gocv.NewMat()
+	// show the image in the window, and wait 1 millisecond
+	for {
+		if ok := webcam.Read(&img); !ok {
+			return
+		}
+		if img.Empty() {
+			continue
+		}
+		imageFaces := classifier.DetectMultiScale(img)
+		faces := len(imageFaces)
+		if faces > 0 {
+			logx.Info("检测到人脸")
+			for _, face := range imageFaces {
+				gocv.Rectangle(&img, face, blue, 3)
+
+				size := gocv.GetTextSize("Human", gocv.FontHersheyPlain, 1.2, 2)
+				pt := image.Pt(face.Min.X+(face.Min.X/2)-(size.X/2), face.Min.Y-2)
+				gocv.PutText(&img, "Human", pt, gocv.FontHersheyPlain, 1.2, blue, 2)
+			}
+		}
+
+		eyes := eyeclassifier.DetectMultiScale(img)
+		eye := len(eyes)
+		if eye > 0 {
+			logx.Info("检测到眼睛")
+			for _, face := range eyes {
+				gocv.Rectangle(&img, face, blue, 3)
+
+				size := gocv.GetTextSize("Human", gocv.FontHersheyPlain, 1.2, 2)
+				pt := image.Pt(face.Min.X+(face.Min.X/2)-(size.X/2), face.Min.Y-2)
+				gocv.PutText(&img, "Human", pt, gocv.FontHersheyPlain, 1.2, blue, 2)
+			}
+		}
+
+		window.IMShow(img)
+		if window.WaitKey(1) >= 0 {
+			break
+		}
+	}
+
+}
+
+func TestFaceStruct(t *testing.T) {
+	f := NewFace()
+	f.loadFaceXmlFile("D:\\opencv\\sources\\data\\haarcascades\\haarcascade_frontalface_alt.xml",
+		"D:\\opencv\\sources\\data\\haarcascades\\haarcascade_eye_tree_eyeglasses.xml",
+		"D:\\opencv\\sources\\data\\haarcascades\\haarcascade_frontalface_alt.xml",
+		"D:\\opencv\\sources\\data\\haarcascades\\haarcascade_eye_tree_eyeglasses.xml")
 }
