@@ -7,6 +7,7 @@ require (
 	github.com/casbin/casbin/v2 v2.50.1
 	github.com/casbin/xorm-adapter/v2 v2.5.1
 	github.com/daida459031925/common v0.0.0-20220820011555-a7852738a8ca
+	github.com/esimov/pigo v1.4.5
 	github.com/go-playground/locales v0.14.0
 	github.com/go-playground/universal-translator v0.18.0
 	github.com/go-playground/validator/v10 v10.11.0
