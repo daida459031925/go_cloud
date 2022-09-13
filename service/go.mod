@@ -15,6 +15,7 @@ require (
 	golang.org/x/text v0.3.8-0.20211105212822-18b340fc7af2
 	google.golang.org/grpc v1.48.0
 	google.golang.org/protobuf v1.28.1
+	github.com/shopspring/decimal v1.3.1
 )
 
 require (

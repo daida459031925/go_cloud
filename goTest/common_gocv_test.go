@@ -1,16 +1,20 @@
 package goTest
 
 import (
+	"errors"
+	"fmt"
 	"github.com/daida459031925/common/error/try"
 	"github.com/daida459031925/common/reflex"
 	"github.com/gogf/gf/v2/container/glist"
+	"github.com/shopspring/decimal"
 	"github.com/zeromicro/go-zero/core/fx"
 	"github.com/zeromicro/go-zero/core/logx"
 	"gocv.io/x/gocv"
 	"image"
 	"image/color"
-	"math"
 	"reflect"
+	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -269,7 +273,7 @@ func TestFaceCutOut(t *testing.T) {
 	window := gocv.NewWindow("Face Detect")
 	defer window.Close()
 	//设置大小并计算画面大小二项坐标 坐标点A（左上）,B（右下）；X的差值 Y的差值
-	window.ResizeWindow(math.Abs(face.Max.X-face.Min.X), face.Max.Y-face.Min.Y)
+	window.ResizeWindow(face.Max.X-face.Min.X, face.Max.Y-face.Min.Y)
 	window.IMShow(croppedMat)
 	//防止程序关闭 按esc关闭
 	for {
@@ -277,4 +281,35 @@ func TestFaceCutOut(t *testing.T) {
 			break
 		}
 	}
+}
+
+func TestMath(t *testing.T) {
+	a, e := strconv.ParseFloat("", 64)
+	if e != nil {
+		logx.Info(a)
+	}
+
+	fff := -8.0497183772403904e-17
+
+	logx.Info(decimal.NewFromFloat(fff))
+
+	logx.Info(fmt.Sprintf("%f", fff))
+
+	d, _ := getDecimal("-2.22222222222222222222222222222222222222")
+	b, _ := getDecimal("-0.00000000000000000000000000000000000001")
+	b0, _ := getDecimal("2")
+	d = d.Add(b)
+
+	logx.Info(d.Add(d).DivRound(b0, 40))
+}
+
+func getDecimal(str string) (decimal.Decimal, error) {
+	s := strings.TrimSpace(str)
+	_, e := strconv.ParseFloat(str, 64)
+	if e != nil {
+		s = "0"
+		e = errors.New(fmt.Sprintf("转换float64失败: %s", e))
+	}
+
+	return decimal.RequireFromString(s), e
 }

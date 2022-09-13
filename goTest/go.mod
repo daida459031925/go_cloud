@@ -13,6 +13,7 @@ require (
 	github.com/go-redis/redis/v9 v9.0.0-beta.2
 	github.com/gogf/gf/v2 v2.1.2
 	github.com/golang-jwt/jwt/v4 v4.4.2
+	github.com/shopspring/decimal v1.3.1
 	github.com/yitter/idgenerator-go v1.3.1
 	github.com/zeromicro/go-zero v1.4.0
 	gocv.io/x/gocv v0.31.0
