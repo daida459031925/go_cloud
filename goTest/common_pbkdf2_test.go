@@ -9,7 +9,7 @@ import (
 )
 
 func TestPbkdf2(t *testing.T) {
-	pwd, salt, e := pbkdf2.EncryptPwd("pwd string")
+	pwd, salt, e := pbkdf2.EncryptPwd("adminadmin")
 	logx.Info(pwd)
 	logx.Info(salt)
 	logx.Info(e)

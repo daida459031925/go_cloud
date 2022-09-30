@@ -11,6 +11,7 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 	"net"
 	"os"
+	"service/common/constant"
 	"strings"
 	"time"
 )
@@ -39,16 +40,16 @@ func NewPulsarClient(addr []net.TCPAddr, cli ...pulsar.ClientOptions) MessagePul
 			addrs = append(addrs, addr[i].String())
 		}
 
-		opt.URL = fmt.Sprintf("pulsar://%s", strings.Join(addrs, ","))
+		opt.URL = fmt.Sprintf(constant.UseClientPulsar01s_01, strings.Join(addrs, constant.SysComma))
 	} else {
-		logx.Errorf("pulsar client error")
+		logx.Errorf(constant.ErrClientPulsar00_01)
 		exit()
 	}
 
 	client, err := pulsar.NewClient(opt)
 
 	if err != nil {
-		logx.Errorf("pulsar client error: %s", err)
+		logx.Errorf(constant.ErrClientPulsar01s_01, err)
 		messagePulsar.exit()
 	}
 
@@ -71,14 +72,14 @@ func NewPulsarClientString(addr string, cli ...pulsar.ClientOptions) MessagePuls
 	if len(addr) > 0 {
 		opt.URL = addr
 	} else {
-		logx.Errorf("pulsar client error")
+		logx.Error(constant.ErrClientPulsar00_01)
 		exit()
 	}
 
 	client, err := pulsar.NewClient(opt)
 
 	if err != nil {
-		logx.Errorf("pulsar client error: %s", err)
+		logx.Errorf(constant.ErrClientPulsar01s_01, err)
 		messagePulsar.exit()
 	}
 
@@ -88,7 +89,7 @@ func NewPulsarClientString(addr string, cli ...pulsar.ClientOptions) MessagePuls
 }
 
 // CreateProducer 创建生产者
-func (m MessagePulsar) CreateProducer(topic string, pro ...pulsar.ProducerOptions) pulsar.Producer {
+func (m MessagePulsar) NewProducer(topic string, pro ...pulsar.ProducerOptions) pulsar.Producer {
 	opt := pulsar.ProducerOptions{}
 
 	if pro != nil && len(pro) > 0 {
@@ -102,7 +103,7 @@ func (m MessagePulsar) CreateProducer(topic string, pro ...pulsar.ProducerOption
 	producer, err := m.Client.CreateProducer(opt)
 
 	if err != nil {
-		logx.Errorf("pulsar producer error: %s", err)
+		logx.Errorf(constant.ErrPulsarProducer01s_01, err)
 		m.exit()
 	}
 
@@ -111,12 +112,12 @@ func (m MessagePulsar) CreateProducer(topic string, pro ...pulsar.ProducerOption
 }
 
 // CreateSubscribe 创建消费者
-func (m MessagePulsar) CreateSubscribe(topic string, subscriptionName string, t pulsar.SubscriptionType, channel chan pulsar.ConsumerMessage) pulsar.Consumer {
-	return m.CreateSubscribeOptions(topic, subscriptionName, t, channel)
+func (m MessagePulsar) NewSubscribe(topic string, subscriptionName string, t pulsar.SubscriptionType, channel chan pulsar.ConsumerMessage) pulsar.Consumer {
+	return m.NewSubscribeOptions(topic, subscriptionName, t, channel)
 }
 
 // CreateSubscribeOptions 创建消费者
-func (m MessagePulsar) CreateSubscribeOptions(topic string, subscriptionName string, t pulsar.SubscriptionType, channel chan pulsar.ConsumerMessage, opts ...pulsar.ConsumerOptions) pulsar.Consumer {
+func (m MessagePulsar) NewSubscribeOptions(topic string, subscriptionName string, t pulsar.SubscriptionType, channel chan pulsar.ConsumerMessage, opts ...pulsar.ConsumerOptions) pulsar.Consumer {
 	opt := pulsar.ConsumerOptions{}
 	if opts != nil && len(opts) > 0 {
 		opt = opts[0]
@@ -129,7 +130,7 @@ func (m MessagePulsar) CreateSubscribeOptions(topic string, subscriptionName str
 
 	consumer, err := m.Subscribe(opt)
 	if err != nil {
-		logx.Errorf("pulsar Subscribe error: %s", err)
+		logx.Errorf(constant.ErrPulsarSubscribe01s_01, err)
 		m.exit()
 	}
 
@@ -169,14 +170,14 @@ func SendProducerAsyncMsg(producer pulsar.Producer, con func() (context.Context,
 }
 
 // CreateListenerMsg 监听消费
-func CreateListenerMsg(consumer pulsar.Consumer, channel chan pulsar.ConsumerMessage, f func(consumerMsg pulsar.ConsumerMessage, consumer pulsar.Consumer)) {
+func NewListenerMsg(consumer pulsar.Consumer, channel chan pulsar.ConsumerMessage, f func(consumerMsg pulsar.ConsumerMessage, consumer pulsar.Consumer)) {
 
 	// Receive messages from channel. The channel returns a struct which contains message and the consumer from where
 	// the message was received. It's not necessary here since we have 1 single consumer, but the channel could be
 	// shared across multiple consumers as well
 	for cm := range channel {
 		msg := cm.Message
-		logx.Infof("Received message  msgId: %v -- content: '%s'\n", msg.ID(), string(msg.Payload()))
+		logx.Info(fmt.Sprintf(constant.UsePulsarConsumerMessage02vs_01, msg.ID(), msg.Payload()))
 		f(cm, consumer)
 	}
 

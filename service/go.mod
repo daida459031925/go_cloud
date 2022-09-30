@@ -4,18 +4,20 @@ go 1.19
 
 require (
 	github.com/apache/pulsar-client-go v0.8.1
-	github.com/daida459031925/common v0.0.0-20220820013731-ab034ad30670
+	github.com/daida459031925/common v0.0.0-20220919063341-a55197e76789
+	github.com/go-playground/locales v0.14.0
+	github.com/go-playground/universal-translator v0.18.0
 	github.com/go-playground/validator/v10 v10.11.0
 	github.com/gogf/gf/v2 v2.1.2
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/pkg/errors v0.9.1
+	github.com/shopspring/decimal v1.3.1
 	github.com/zeromicro/go-zero v1.4.0
 	gocv.io/x/gocv v0.31.0
 	golang.org/x/net v0.0.0-20220531201128-c960675eff93
 	golang.org/x/text v0.3.8-0.20211105212822-18b340fc7af2
 	google.golang.org/grpc v1.48.0
 	google.golang.org/protobuf v1.28.1
-	github.com/shopspring/decimal v1.3.1
 )
 
 require (
@@ -35,8 +37,6 @@ require (
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-playground/locales v0.14.0 // indirect
-	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/godbus/dbus v0.0.0-20190726142602-4481cbc300e2 // indirect

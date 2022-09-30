@@ -6,6 +6,7 @@ import (
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
 	"service/common/constant"
+	"service/common/goZeroServer"
 	"service/common/middlewares"
 	"service/userService/api/internal/config"
 	"service/userService/api/internal/handler"
@@ -22,18 +23,21 @@ func main() {
 
 	ctx := svc.NewServiceContext(c)
 	server := rest.MustNewServer(c.RestConf)
-	defer server.Stop()
+	myServer := goZeroServer.NewServer(server)
 
 	// 全局中间件 自定义中间 可以拦截所有错误，那么可以在里面自定义错误集
 	var mid = middlewares.SetHandlers(
-		middlewares.CreateError(constant.LogicLog),
-		//middlewares.CreateXSS(constant.LogicLog),
+		middlewares.NewAuthorize(),
+		middlewares.NewError(constant.LogicLog),
+		//middlewares.NewXSS(constant.LogicLog),
 	)
 	mid.InitAll(server)
 
 	handler.RegisterHandlers(server, ctx)
 
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
-	server.Start()
+
+	myServer.Start()
+	defer myServer.Stop()
 
 }

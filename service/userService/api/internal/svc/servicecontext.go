@@ -2,13 +2,12 @@ package svc
 
 import (
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
-	"github.com/zeromicro/go-zero/zrpc"
 	sysImpl "service/common/generalSql/impl/sys"
 	"service/userService/api/internal/config"
 	"service/userService/rpc/user"
 )
 
-// svc时服务起来相当于初始化什么东西
+// ServiceContext svc时服务起来相当于初始化什么东西
 type ServiceContext struct {
 	Config config.Config
 	//添加数据库支持
@@ -32,6 +31,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		SysResModel:  sysImpl.GetSysResourcesModel(conn, c.CacheRedis),
 		SysRoleModel: sysImpl.GetSysRoleModel(conn, c.CacheRedis),
 		//添加rpc依赖
-		UserRpc: user.NewUser(zrpc.MustNewClient(c.UserRpc)),
+		UserRpc: nil, //user.NewUser(zrpc.MustNewClient(c.UserRpc)),
 	}
 }

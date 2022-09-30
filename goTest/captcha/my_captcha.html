@@ -1,0 +1,69 @@
+<!doctype html>
+<head>
+    <title>GO 简单制作验证码案例</title>
+    <style>
+        input{
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<script>
+
+    // 设置语言
+    function setSrcQuery(e, q) {
+        var src = e.src;
+        var p = src.indexOf('?');
+        if (p >= 0) {
+            src = src.substr(0, p);
+        }
+        e.src = src + "?" + q
+    }
+
+    // 播放音频
+    function playAudio() {
+        var le = document.getElementById("lang");
+        var lang = le.options[le.selectedIndex].value;
+        var e = document.getElementById('audio')
+        setSrcQuery(e, "lang=" + lang)
+        e.style.display = 'block';
+        e.autoplay = 'true';
+        return false;
+    }
+
+    // 切换语言
+    function changeLang() {
+        var e = document.getElementById('audio')
+        if (e.style.display == 'block') {
+            playAudio();
+        }
+    }
+
+    // 重新加载
+    function reload() {
+        setSrcQuery(document.getElementById('image'), "reload=" + (new Date()).getTime());
+        setSrcQuery(document.getElementById('audio'), (new Date()).getTime());
+        return false;
+    }
+</script>
+<div align="center" >
+    <select id="lang" onchange="changeLang()">
+        <option value="en">英文</option>
+        <option value="zh">中文</option>
+    </select>
+</div>
+
+<form action="/processCapcha" method=post align="center">
+    <p>请输入你在下面的图片中看到的数字:</p>
+    <p><img id=image src="/captcha/{{.CaptchaId}}.png" alt="Captcha image"></p>
+    <a href="#" onclick="reload()">重新加载</a>   |   <a href="#" onclick="playAudio()">播放音频验证码</a>
+
+    <audio id=audio controls style="display:none" src="/captcha/{{.CaptchaId}}.wav" preload=none>
+        You browser doesn't support audio.
+        <a href="/captcha/download/{{.CaptchaId}}.wav">下载文件</a> to play it in the external player.
+    </audio>
+
+    <input type=hidden name=captchaId value="{{.CaptchaId}}" align=center><br>
+    <input name=captchaSolution align=center>
+    <input type=submit value=Submit>
+</form>

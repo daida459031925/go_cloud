@@ -2,14 +2,14 @@ package logic
 
 import (
 	"context"
-	"fmt"
+	"github.com/daida459031925/common/encryption/pbkdf2"
 	"github.com/daida459031925/common/result"
 	"github.com/zeromicro/go-zero/core/logx"
-	"gocv.io/x/gocv"
-	"golang.org/x/net/html/atom"
+	"service/common/constant"
+	"service/common/token"
 	"service/userService/api/internal/svc"
 	"service/userService/api/internal/types"
-	"service/userService/rpc/user"
+	"strings"
 )
 
 type LoginLogic struct {
@@ -27,60 +27,60 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) LoginLogic {
 }
 
 func (l *LoginLogic) Login(req types.Login) (resp result.Result) {
-	fmt.Printf("gocv version: %s\n", gocv.Version())
-	fmt.Printf("opencv lib version: %s\n", gocv.OpenCVVersion())
-	// todo: add your logic here and delete this line
-	//if len(strings.TrimSpace(req.Username)) == 0 || len(strings.TrimSpace(req.Password)) == 0 {
-	//	return result.Error("参数错误")
-	//}
-	var i uint64 = 1
-	var u user.IdReq
-	u.Id = i
-	fmt.Println(u)
-	u1, e := l.svcCtx.UserRpc.GetUser(l.ctx, &u)
-	if e != nil {
-		return nil, e
+	//去除左右的空格然后需要验证字段
+	u := strings.TrimSpace(req.Username)
+	p := strings.TrimSpace(req.Password)
+	loginErrString := constant.ResultLoginErr01
+
+	if len(u) == 0 || len(p) == 0 {
+		return result.Error(loginErrString)
 	}
-	fmt.Println(u1)
 
-	atom.Time.String()
-	a, b := 1, 0
-	fmt.Println(a / b)
+	//使用布隆过滤器进行身份验证
 
-	userInfo, err := l.svcCtx.SysUserModel.FindOne(1)
-	fmt.Println(userInfo)
-	fmt.Println(err)
-	//switch err {
-	//case nil:
-	//case model.ErrNotFound:
-	//	return result.Error("用户名不存在")
-	//default:
-	//	return result.Error("未知错误")
-	//}
+	//找到用户密码需要进行加密处理
+	user, e := l.svcCtx.SysUserModel.FindOneLoginUser(u)
+	if e != nil {
+		return result.Error(loginErrString)
+	}
 
-	//if "userInfo.Password" != req.Password {
-	//	return result.Error("用户密码不正确")
-	//}
+	tf := pbkdf2.CheckEncryptPwdMatch(p, user.Password)
 
-	//User,err := l.svcCtx.UserRpc.GetUser(l.ctx,nil)
+	if !tf {
+		return result.Error(loginErrString)
+	}
 
-	// ---start---
-	//now := time.Now().Unix()
-	//Secret := userInfo.Secret
-	//PrevSecret := userInfo.PrevSecret
-	//TokenExpire := userInfo.TokenExpire
-	//jwtToken, err := (l.svcCtx.Config.Auth.AccessSecret, now, l.svcCtx.Config.Auth.AccessExpire, userInfo.Id)
-	//if err != nil {
-	//	return nil, err
-	//}
+	var payloads map[string]interface{} = make(map[string]interface{})
+	payloads["prevSecret"] = user.PrevSecret
+	payloads["secret"] = user.Secret
+	payloads["userId"] = user.Id
+
+	s, accessExpire, e := token.GetToken(user.Secret, payloads, user.TokenExpire)
+	if e != nil {
+		return result.Error(loginErrString)
+	}
+
+	var gender string
+
+	switch user.DictId {
+	case 0:
+		gender = "未知"
+	case 1:
+		gender = "男"
+	case 2:
+		gender = "女"
+	default:
+		gender = "未知"
+	}
+
 	// ---end---
 	ru := &types.RUserToken{
-		//Id:           userInfo.Id,
-		//Name:         userInfo.Name,
-		//Gender:       userInfo.Gender,
-		//AccessToken:  jwtToken,
-		//AccessExpire: now + accessExpire,
-		//RefreshAfter: now + accessExpire/2,
+		Id:           user.Id,
+		Name:         user.Account,
+		Gender:       gender,
+		AccessToken:  s,
+		AccessExpire: accessExpire,
+		RefreshAfter: accessExpire - 5*60, //建议刷新时间提前5分钟
 	}
 	return result.Ok(ru)
 }

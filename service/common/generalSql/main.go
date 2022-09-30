@@ -5,18 +5,20 @@ import (
 	"fmt"
 	rsql "github.com/daida459031925/common/reflex/sql"
 	"github.com/pkg/errors"
+	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/builder"
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"github.com/zeromicro/go-zero/core/stringx"
+	"service/common/constant"
 	"strconv"
 	"strings"
 )
 
 // 根据拿到的key 和 value 进行sql语句动态执行
 type (
-	//通用泛型接口可以从数据库基础信息传入 相当于初始化时候设置类型
+	// DefaultModel 通用泛型接口可以从数据库基础信息传入 相当于初始化时候设置类型
 	DefaultModel[T any] struct {
 		/*-----------数据库相关---------------*/
 
@@ -44,7 +46,7 @@ type (
 
 	}
 
-	//需要对接口下基本内容进行实现
+	// TkMybatisModel 需要对接口下基本内容进行实现
 	TkMybatisModel interface {
 		Insert(data any) (sql.Result, error)
 		FindOne(id uint64) (any, error)
@@ -58,18 +60,18 @@ type (
 	}
 )
 
-// 创建时候指定类型
-func CreateModel[T any](conn sqlx.SqlConn, c cache.CacheConf, table string) *DefaultModel[T] {
+// NewModel 创建时候指定类型
+func NewModel[T any](conn sqlx.SqlConn, c cache.CacheConf, table string) *DefaultModel[T] {
 	var t T
 	query := builder.RawFieldNames(t)
 	return &DefaultModel[T]{
 		CachedConn:    sqlc.NewConn(conn, c),
 		Sqlcon:        conn,
 		Table:         table,
-		CacheIdPrefix: fmt.Sprintf("cache:%s:id:", table),
+		CacheIdPrefix: fmt.Sprintf(constant.UseSqlCache, table),
 		ErrNotFound:   sqlx.ErrNotFound,
 		FieldNames:    query,
-		FieldNameRows: strings.Join(query, ","),
+		FieldNameRows: strings.Join(query, constant.SysComma),
 	}
 }
 
@@ -81,24 +83,26 @@ func (d *DefaultModel[T]) Insert(data any) (sql.Result, error) {
 	var value []interface{}
 	keys, err := rsql.RawField(data, 0)
 	if err != nil {
-		return nil, errors.New("Insert 获取key失败 ")
+		logx.Error(err)
+		return nil, errors.New(constant.ErrSqlInsert00_01)
 	}
-	key = strings.Join(keys, ",")
+	key = strings.Join(keys, constant.SysComma)
 
 	var valueDataString []string
 
 	//获取传入的value
 	values, err := rsql.RawField(data, 1)
 	if err != nil {
-		return nil, errors.New("Insert 获取value失败 ")
+		logx.Error(err)
+		return nil, errors.New(constant.ErrSqlInsert00_02)
 	}
 
 	for i := range values {
 		value = append(value, values[i])
-		valueDataString = append(valueDataString, "?")
+		valueDataString = append(valueDataString, constant.SysDoubt)
 	}
 
-	v := strings.Join(valueDataString, ",")
+	v := strings.Join(valueDataString, constant.SysComma)
 
 	query := fmt.Sprintf("insert into %s (%s) values (%s)", d.Table, key, v)
 	ret, err := d.ExecNoCache(query, value...)
@@ -106,7 +110,7 @@ func (d *DefaultModel[T]) Insert(data any) (sql.Result, error) {
 	return ret, err
 }
 
-// 需要添加查询什么内容，例如我要查询user
+// FindOne 需要添加查询什么内容，例如我要查询user
 func (d *DefaultModel[T]) FindOne(id uint64) (any, error) {
 	idKey := fmt.Sprintf("%s%v", d.CacheIdPrefix, id)
 	var resp T
@@ -128,7 +132,7 @@ func (d *DefaultModel[T]) FindOne(id uint64) (any, error) {
 	}
 }
 
-// 通过仔细思考更新时候必须强行代入id，防止数据修改错误
+// Update 通过仔细思考更新时候必须强行代入id，防止数据修改错误
 func (d *DefaultModel[T]) Update(data any, id uint64) error {
 	//sysUserRowsWithPlaceHolder = strings.Join(stringx.Remove(sysUserFieldNames, "`id`", "`create_time`", "`update_time`"), "=?,") + "=?"
 
@@ -137,14 +141,16 @@ func (d *DefaultModel[T]) Update(data any, id uint64) error {
 	var value []interface{}
 	keys, err := rsql.RawField(data, 0)
 	if err != nil {
-		return errors.New("Insert 获取key失败 ")
+		logx.Error(err)
+		return errors.New(constant.ErrSqlUpdate00_01)
 	}
-	key = strings.Join(stringx.Remove(keys, "id"), "=?,") + "=?"
+	key = strings.Join(stringx.Remove(keys, constant.SysId), "=?,") + "=?"
 
 	//获取传入的value
 	values, err := rsql.RawField(data, 1)
 	if err != nil {
-		return errors.New("Insert 获取value失败 ")
+		logx.Error(err)
+		return errors.New(constant.ErrSqlUpdate00_02)
 	}
 
 	for i := range values {
@@ -177,19 +183,21 @@ func (d *DefaultModel[T]) InsertList(datas []any) (uint64, error) {
 	var value = make([]string, 0)
 	keys, err := rsql.RawField(datas[0], 3)
 	if err != nil {
-		return 0, errors.New("批量添加，获取key错误")
+		logx.Error(err)
+		return 0, errors.New(constant.ErrSqlInsertList00_01)
 	}
 
 	for range keys {
-		value = append(value, "?")
+		value = append(value, constant.SysDoubt)
 	}
 
 	var insertsql = fmt.Sprintf(`insert into %s(%s) values (%s)`,
-		d.Table, strings.Join(keys, ","), strings.Join(value, ","))
+		d.Table, strings.Join(keys, constant.SysComma), strings.Join(value, constant.SysComma))
 
 	bulkInserter, err := sqlx.NewBulkInserter(d.Sqlcon, insertsql)
 	if err != nil {
-		return 0, errors.New("批量添加，连接错误错误")
+		logx.Error(err)
+		return 0, errors.New(constant.ErrSqlInsertList00_02)
 	}
 
 	var reurnErr error = nil
@@ -197,7 +205,8 @@ func (d *DefaultModel[T]) InsertList(datas []any) (uint64, error) {
 	for i := range datas {
 		val, err := rsql.RawField(datas[i], 4)
 		if err != nil {
-			reurnErr = errors.New("批量添加，获取对象参数错误")
+			logx.Error(err)
+			reurnErr = errors.New(constant.ErrSqlInsertList00_03)
 			break
 		}
 
@@ -207,7 +216,8 @@ func (d *DefaultModel[T]) InsertList(datas []any) (uint64, error) {
 		}
 
 		if err := bulkInserter.Insert(valData...); err != nil {
-			reurnErr = errors.New(fmt.Sprintf("批量添加，添加失败: %s", valData))
+			logx.Error(err)
+			reurnErr = errors.New(fmt.Sprintf(constant.ErrSqlInsertList01s_05, valData))
 			break
 		}
 		reurnList++
@@ -218,7 +228,7 @@ func (d *DefaultModel[T]) InsertList(datas []any) (uint64, error) {
 	}
 
 	bulkInserter.Flush()
-	fmt.Println("批量添加，添加成功,完毕")
+	logx.Info(constant.ErrSqlInsertList00_04)
 
 	return reurnList, nil
 }
@@ -430,7 +440,7 @@ func (d *DefaultModel[T]) UpdateList(datas []any) error {
 	return nil
 }
 
-// 批量删除数据库数据，同时删除缓存
+// DeleteList 批量删除数据库数据，同时删除缓存
 func (d *DefaultModel[T]) DeleteList(ids []uint64) error {
 	var idkeys []string
 	var idvalues []string
@@ -442,7 +452,7 @@ func (d *DefaultModel[T]) DeleteList(ids []uint64) error {
 	}
 
 	_, err := d.Exec(func(conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("delete from %s where `id` in (%s)", d.Table, strings.Join(idvalues, ","))
+		query := fmt.Sprintf("delete from %s where `id` in (%s)", d.Table, strings.Join(idvalues, constant.SysComma))
 		return conn.Exec(query, args...)
 	}, idkeys...)
 	return err

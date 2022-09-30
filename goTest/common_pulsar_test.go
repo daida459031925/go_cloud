@@ -56,7 +56,7 @@ func NewPulsarClient(addr []net.TCPAddr, cli ...pulsar.ClientOptions) messagePul
 }
 
 // 创建生产者
-func (m messagePulsar) CreateProducer(topic string, pro ...pulsar.ProducerOptions) pulsar.Producer {
+func (m messagePulsar) NewProducer(topic string, pro ...pulsar.ProducerOptions) pulsar.Producer {
 	opt := pulsar.ProducerOptions{}
 
 	if pro != nil && len(pro) > 0 {
@@ -79,12 +79,12 @@ func (m messagePulsar) CreateProducer(topic string, pro ...pulsar.ProducerOption
 }
 
 // 创建消费者
-func (m messagePulsar) CreateSubscribe(topic string, subscriptionName string, t pulsar.SubscriptionType, channel chan pulsar.ConsumerMessage) pulsar.Consumer {
-	return m.CreateSubscribeOptions(topic, subscriptionName, t, channel)
+func (m messagePulsar) NewSubscribe(topic string, subscriptionName string, t pulsar.SubscriptionType, channel chan pulsar.ConsumerMessage) pulsar.Consumer {
+	return m.NewSubscribeOptions(topic, subscriptionName, t, channel)
 }
 
 // 创建消费者
-func (m messagePulsar) CreateSubscribeOptions(topic string, subscriptionName string, t pulsar.SubscriptionType, channel chan pulsar.ConsumerMessage, opts ...pulsar.ConsumerOptions) pulsar.Consumer {
+func (m messagePulsar) NewSubscribeOptions(topic string, subscriptionName string, t pulsar.SubscriptionType, channel chan pulsar.ConsumerMessage, opts ...pulsar.ConsumerOptions) pulsar.Consumer {
 	opt := pulsar.ConsumerOptions{}
 	if opts != nil && len(opts) > 0 {
 		opt = opts[0]
@@ -145,7 +145,7 @@ func SendProducerAsyncMsg(producer pulsar.Producer, con func() (context.Context,
 }
 
 // 监听消费
-func CreateListenerMsg(consumer pulsar.Consumer, channel chan pulsar.ConsumerMessage, f func(consumerMsg pulsar.ConsumerMessage, consumer pulsar.Consumer)) {
+func NewListenerMsg(consumer pulsar.Consumer, channel chan pulsar.ConsumerMessage, f func(consumerMsg pulsar.ConsumerMessage, consumer pulsar.Consumer)) {
 
 	// Receive messages from channel. The channel returns a struct which contains message and the consumer from where
 	// the message was received. It's not necessary here since we have 1 single consumer, but the channel could be
@@ -184,8 +184,8 @@ func DistinctIp(addr []net.TCPAddr) []net.TCPAddr {
 func TestProducerMsg(t *testing.T) {
 
 	addr := make([]net.TCPAddr, 0)
-	addr = append(addr, IP.CreateIp(192, 168, 0, 100, 6550))
-	addr = append(addr, IP.CreateIp(192, 168, 0, 100, 6550))
+	addr = append(addr, IP.NewIp(192, 168, 0, 100, 6550))
+	addr = append(addr, IP.NewIp(192, 168, 0, 100, 6550))
 	DistinctIp(addr)
 
 	//client := NewPulsarClient(ip,port)

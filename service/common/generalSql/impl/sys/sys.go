@@ -9,19 +9,19 @@ import (
 
 type (
 	SysDictModel struct {
-		*generalSql.DefaultModel[sys.SysDict]
+		*generalSql.DefaultModel[sys.Dict]
 	}
 
 	SysResourcesModel struct {
-		*generalSql.DefaultModel[sys.SysResources]
+		*generalSql.DefaultModel[sys.Resources]
 	}
 
 	SysRoleModel struct {
-		*generalSql.DefaultModel[sys.SysRole]
+		*generalSql.DefaultModel[sys.Role]
 	}
 
 	SysUserModel struct {
-		*generalSql.DefaultModel[sys.SysUser]
+		*generalSql.DefaultModel[sys.User]
 	}
 
 	SysDictImpl interface {
@@ -39,6 +39,7 @@ type (
 	SysUserImpl interface {
 		generalSql.TkMybatisModel
 		FindOneAndDeleted(id uint64, deleted ...int) (any, error)
+		FindOneLoginUser(account string) (*sys.User, error)
 	}
 )
 
@@ -56,17 +57,17 @@ const (
 )
 
 func GetSysUserModel(conn sqlx.SqlConn, cache cache.CacheConf) SysUserImpl {
-	return &SysUserModel{generalSql.CreateModel[sys.SysUser](conn, cache, sysUser)}
+	return &SysUserModel{generalSql.NewModel[sys.User](conn, cache, sysUser)}
 }
 
 func GetSysDictModel(conn sqlx.SqlConn, cache cache.CacheConf) SysDictImpl {
-	return &SysDictModel{generalSql.CreateModel[sys.SysDict](conn, cache, sysDict)}
+	return &SysDictModel{generalSql.NewModel[sys.Dict](conn, cache, sysDict)}
 }
 
 func GetSysResourcesModel(conn sqlx.SqlConn, cache cache.CacheConf) SysResourcesImpl {
-	return &SysResourcesModel{generalSql.CreateModel[sys.SysResources](conn, cache, sysResources)}
+	return &SysResourcesModel{generalSql.NewModel[sys.Resources](conn, cache, sysResources)}
 }
 
 func GetSysRoleModel(conn sqlx.SqlConn, cache cache.CacheConf) SysRoleImpl {
-	return &SysRoleModel{generalSql.CreateModel[sys.SysRole](conn, cache, sysRole)}
+	return &SysRoleModel{generalSql.NewModel[sys.Role](conn, cache, sysRole)}
 }

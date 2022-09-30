@@ -12,39 +12,39 @@ info(
 
 type (
 	Login { //登录使用 目前缺少验证码
-		Username string `json:"username" form:"username" validate:"required,min=8,max=30"`
-		Password string `json:"password" form:"password" validate:"required,min=8,max=30"`
+		Username string `json:"username" validate:"required,min=8,max=30"`
+		Password string `json:"password" validate:"required,min=8,max=30"`
 	}
 
 	logoutUserToken { //登出
-		Id int64 `json:"id" form:"id"`
+		Id uint64 `json:"id"`
 	}
 
 	RUserToken { //返还对应json数据 使用jwt技术用来保证用户
-		Id           int64  `json:"id"`
+		Id           uint64 `json:"id"`
 		Name         string `json:"name"`
 		Gender       string `json:"gender"`
 		AccessToken  string `json:"accessToken"`
-		AccessExpire int64  `json:"accessExpire"`
-		RefreshAfter int64  `json:"refreshAfter"`
+		AccessExpire uint64 `json:"accessExpire"`
+		RefreshAfter uint64 `json:"refreshAfter"`
 	}
 
 	AddDBSysUser { //添加用户参数
-		Deleted         int    `json:"deleted,default=1" form:"deleted,default=1"`                                               // 标识是否删除1存在 2删除
-		Account         string `json:"account" form:"account" validate:"required,min=8,max=30"`                                  // 账号
-		Password        string `json:"password" form:"password" validate:"required,min=8,max=30,eqfield=comparePassword"`        // 密码
-		ComparePassword string `json:"comparePassword" form:"comparePassword" validate:"required,min=8,max=30,eqfield=password"` // 密码
-		Gender          int    `json:"gender,default=0,options=0|1|2" form:"gender,default=0,options=0|1|2"`                     // 性别（未知|男|女）
-		TokenExpire     int    `json:"tokenExpire" form:"tokenExpire"`                                                           // token时间 单位秒
+		Deleted         int    `json:"deleted,default=1"`                                                 // 标识是否删除1存在 2删除
+		Account         string `json:"account" validate:"required,min=8,max=30"`                          // 账号
+		Password        string `json:"password" validate:"required,min=8,max=30,eqfield=comparePassword"` // 密码
+		ComparePassword string `json:"comparePassword" validate:"required,min=8,max=30,eqfield=password"` // 密码
+		Gender          int    `json:"gender,default=0,options=0|1|2"`                                    // 性别（未知|男|女）
+		TokenExpire     uint64 `json:"tokenExpire"`                                                       // token时间 单位秒
 	}
 
 	UpdDBSysUser { //更新用户对象
-		Id              uint64 `json:"id" form:"id"`                                                                             // 唯一主键id
-		Deleted         int    `json:"deleted" form:"deleted"`                                                                   // 标识是否删除1存在 2删除
-		Password        string `json:"password" form:"password" validate:"required,min=8,max=30,eqfield=comparePassword"`        // 密码
-		ComparePassword string `json:"comparePassword" form:"comparePassword" validate:"required,min=8,max=30,eqfield=password"` // 密码
-		Gender          int    `json:"gender,default=0,options=0|1|2" form:"gender,default=0,options=0|1|2"`                     // 性别（未知|男|女）
-		TokenExpire     int    `json:"tokenExpire" form:"tokenExpire"`                                                           // token时间 单位秒
+		Id              uint64 `json:"id"`                                                                // 唯一主键id
+		Deleted         int    `json:"deleted"`                                                           // 标识是否删除1存在 2删除
+		Password        string `json:"password" validate:"required,min=8,max=30,eqfield=comparePassword"` // 密码
+		ComparePassword string `json:"comparePassword" validate:"required,min=8,max=30,eqfield=password"` // 密码
+		Gender          int    `json:"gender,default=0,options=0|1|2"`                                    // 性别（未知|男|女）
+		TokenExpire     uint64 `json:"tokenExpire"`                                                       // token时间 单位秒
 	}
 
 	RSysUser { // 返还用户对象用于展示
@@ -62,33 +62,32 @@ type (
 )
 
 //不管返还什么内容，都必须使用resp result.Result 进行封装 api永远返回200 参数中添加code 200 500错误
-@server (
-	middleware: Example // 路由中间件声明
-)//参数验证
+//@server (
+//	middleware: Example // 路由中间件声明
+//)//参数验证
 service user-api {
 	//登录
 	@handler login
 	post /user/login (Login) returns (RUserToken)
 }
 
-@server (
-	jwt: Auth,
-	middleware: Example // 路由中间件声明
-)
+//@server (
+//	jwt: Auth, //权限验证 不需要写，这个自己实现
+//	middleware: Example // 路由中间件声明
+//)
 service user-api {
 	//退出
 	@handler logout
 	post /user/logout (logoutUserToken) returns ()
-
+	
 	//刷新token
 	@handler refresh
 	post /user/refresh (RUserToken) returns ()
-
-
+	
 	//查询单个
 	@handler find_one
 	post /user/find (UpdDBSysUser) returns (RSysUser)
-
+	
 	//普通crud
 	@handler add
 	post /user/add (AddDBSysUser) returns (RSysUser)
@@ -96,7 +95,7 @@ service user-api {
 	post /user/upd (UpdDBSysUser) returns (RSysUser)
 	@handler del
 	post /user/del (UpdDBSysUser) returns (RSysUser)
-
+	
 	//需要自定义参数以及返还值 批量必须全部成功
 	@handler adds
 	post /user/adds () returns ()
@@ -104,7 +103,7 @@ service user-api {
 	post /user/upds () returns ()
 	@handler dels
 	post /user/dels () returns ()
-
+	
 	//需要自定义参数以及返还值 批量错误不加
 	@handler part_adds
 	post /user/part/adds () returns ()
@@ -112,5 +111,5 @@ service user-api {
 	post /user/part/upds () returns ()
 	@handler part_dels
 	post /user/part/dels () returns ()
-
+	
 }

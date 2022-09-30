@@ -55,3 +55,13 @@ goctl model mysql datasource -url="$datasource" -table="user" -c -dir .
 5.编写svc下初始化信息
 6.添加logic业务逻辑
 7.其他需要调用服务 重复步骤 3，4，5，6
+
+# 返还数据方式
+这取决于你业务场景中的{Ex}结构是什么 ，外面会怎么用！
+一般来说，如果你返回的是一个资源(特别是包含状态的资源)或者比较大的结构体 返回指针总会更好！
+当然如果你的{Ex}就是几个int的组合，返回结构也不错, 比如标准库time中的Date
+func Date(year int, month Month, day, hour, min, sec, nsec int, loc *Location) Time
+
+非基本库中使用统一返还指针，除非第三方框架自己都是使用的值返还，例如：
+func RequireFromString(value string) Decimal
+

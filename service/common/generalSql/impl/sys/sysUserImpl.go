@@ -1,22 +1,22 @@
 package generalSql
 
 import (
+	"errors"
 	"fmt"
-	"github.com/zeromicro/go-zero/core/fx"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
+	"service/common/constant"
 	"service/common/generalSql/model/sys"
+	"strings"
 )
 
 func (d *SysUserModel) FindOneAndDeleted(id uint64, deleted ...int) (any, error) {
 	idKey := fmt.Sprintf("%s%v", d.CacheIdPrefix, id)
-	var resp sys.SysUser
+	var resp sys.User
 
 	del := 1
 
-	if len(deleted) > 0 && fx.Just(1, 2).AnyMach(func(item interface{}) bool {
-		return deleted[0] == item.(int)
-	}) {
+	if deleted != nil && len(deleted) > 0 {
 		del = deleted[0]
 	}
 
@@ -35,4 +35,25 @@ func (d *SysUserModel) FindOneAndDeleted(id uint64, deleted ...int) (any, error)
 	default:
 		return nil, err
 	}
+}
+
+func (d *SysUserModel) FindOneLoginUser(account string) (*sys.User, error) {
+	var resp sys.User
+	var e error = nil
+	//获取可以传入的key
+	a := strings.TrimSpace(account)
+	if len(a) <= 0 {
+		return &resp, errors.New(constant.ErrSqlFind00_01)
+	}
+
+	args := []interface{}{a}
+	query := fmt.Sprintf("select %s from %s where `account` = ? limit 1", d.FieldNameRows, d.Table)
+
+	err := d.QueryRowNoCache(&resp, query, args...)
+
+	if err == sqlc.ErrNotFound {
+		e = d.ErrNotFound
+	}
+
+	return &resp, e
 }

@@ -2,39 +2,39 @@
 package types
 
 type Login struct {
-	Username string `json:"username" form:"username" validate:"required,min=8,max=30"`
-	Password string `json:"password" form:"password" validate:"required,min=8,max=30"`
+	Username string `json:"username" validate:"required,min=8,max=30"`
+	Password string `json:"password" validate:"required,min=8,max=30"`
 }
 
 type LogoutUserToken struct {
-	Id int64 `json:"id" form:"id"`
+	Id uint64 `json:"id"`
 }
 
 type RUserToken struct {
-	Id           int64  `json:"id"`
+	Id           uint64 `json:"id"`
 	Name         string `json:"name"`
 	Gender       string `json:"gender"`
 	AccessToken  string `json:"accessToken"`
-	AccessExpire int64  `json:"accessExpire"`
-	RefreshAfter int64  `json:"refreshAfter"`
+	AccessExpire uint64 `json:"accessExpire"`
+	RefreshAfter uint64 `json:"refreshAfter"`
 }
 
 type AddDBSysUser struct {
-	Deleted         int    `json:"deleted,default=1" form:"deleted,default=1"`                                               // 标识是否删除1存在 2删除
-	Account         string `json:"account" form:"account" validate:"required,min=8,max=30"`                                  // 账号
-	Password        string `json:"password" form:"password" validate:"required,min=8,max=30,eqfield=comparePassword"`        // 密码
-	ComparePassword string `json:"comparePassword" form:"comparePassword" validate:"required,min=8,max=30,eqfield=password"` // 密码
-	Gender          int    `json:"gender,default=0,options=0|1|2" form:"gender,default=0,options=0|1|2"`                     // 性别（未知|男|女）
-	TokenExpire     int    `json:"tokenExpire" form:"tokenExpire"`                                                           // token时间 单位秒
+	Deleted         int    `json:"deleted,default=1"`                                                 // 标识是否删除1存在 2删除
+	Account         string `json:"account" validate:"required,min=8,max=30"`                          // 账号
+	Password        string `json:"password" validate:"required,min=8,max=30,eqfield=comparePassword"` // 密码
+	ComparePassword string `json:"comparePassword" validate:"required,min=8,max=30,eqfield=password"` // 密码
+	Gender          int    `json:"gender,default=0,options=0|1|2"`                                    // 性别（未知|男|女）
+	TokenExpire     uint64 `json:"tokenExpire"`                                                       // token时间 单位秒
 }
 
 type UpdDBSysUser struct {
-	Id              uint64 `json:"id" form:"id"`                                                                             // 唯一主键id
-	Deleted         int    `json:"deleted" form:"deleted"`                                                                   // 标识是否删除1存在 2删除
-	Password        string `json:"password" form:"password" validate:"required,min=8,max=30,eqfield=comparePassword"`        // 密码
-	ComparePassword string `json:"comparePassword" form:"comparePassword" validate:"required,min=8,max=30,eqfield=password"` // 密码
-	Gender          int    `json:"gender,default=0,options=0|1|2" form:"gender,default=0,options=0|1|2"`                     // 性别（未知|男|女）
-	TokenExpire     int    `json:"tokenExpire" form:"tokenExpire"`                                                           // token时间 单位秒
+	Id              uint64 `json:"id"`                                                                // 唯一主键id
+	Deleted         int    `json:"deleted"`                                                           // 标识是否删除1存在 2删除
+	Password        string `json:"password" validate:"required,min=8,max=30,eqfield=comparePassword"` // 密码
+	ComparePassword string `json:"comparePassword" validate:"required,min=8,max=30,eqfield=password"` // 密码
+	Gender          int    `json:"gender,default=0,options=0|1|2"`                                    // 性别（未知|男|女）
+	TokenExpire     uint64 `json:"tokenExpire"`                                                       // token时间 单位秒
 }
 
 type RSysUser struct {

@@ -31,7 +31,7 @@ type Name struct {
 	TokenExpireName string         `json:"token_expire_name"` // token时间 单位秒
 }
 
-//可以拿到结构体中对应的数据，不管是什么结构体都能拿到
+// 可以拿到结构体中对应的数据，不管是什么结构体都能拿到
 func TestRawFieldValues(tes *testing.T) {
 	var n = Name{}
 
@@ -54,7 +54,7 @@ func TestRawFieldValues(tes *testing.T) {
 
 }
 
-//可以拿到结构体中对应的数据，不管是什么结构体都能拿到
+// 可以拿到结构体中对应的数据，不管是什么结构体都能拿到
 func TestRawField(tes *testing.T) {
 	var n = Name{TokenExpire: sql.NullInt64{Int64: 123, Valid: true}}
 	in := make([]Name, 0)
@@ -73,7 +73,7 @@ func TestRawField(tes *testing.T) {
 	}
 }
 
-//根据拿到的key 和 value 进行sql语句动态执行
+// 根据拿到的key 和 value 进行sql语句动态执行
 type (
 	defaultModel struct {
 		sqlc.CachedConn
@@ -97,7 +97,7 @@ type (
 	}
 )
 
-func createModel(conn sqlx.SqlConn, c cache.CacheConf, table string) tkMybatisModel {
+func newModel(conn sqlx.SqlConn, c cache.CacheConf, table string) tkMybatisModel {
 	return &defaultModel{
 		CachedConn:    sqlc.NewConn(conn, c),
 		table:         table,

@@ -8,8 +8,8 @@ import (
 // 如果struct名称首字母是小写的，这个struct不会被导出。连同它里面的字段也不会导出，即使有首字母大写的字段名。
 // 如果struct名称首字母大写，则struct会被导出，但只会导出它内部首字母大写的字段，那些小写首字母的字段不会被导出。
 type (
-	//字典表
-	SysDict struct {
+	// Dict 字典表
+	Dict struct {
 		Id           uint64         `db:"id"`             // 字典主键
 		Deleted      uint64         `db:"deleted"`        // 标识是否删除1存在 2删除
 		Status       uint64         `db:"status"`         // 状态（1正常 2停用）
@@ -25,8 +25,8 @@ type (
 		UpdateUserId sql.NullInt64  `db:"update_user_id"` // 更新者
 		UpdateTime   sql.NullTime   `db:"update_time"`    // 更新时间
 	}
-	//资源表
-	SysResources struct {
+	// Resources 资源表
+	Resources struct {
 		Id           uint64         `db:"id"`             // 唯一主键id
 		Deleted      uint64         `db:"deleted"`        // 标识是否删除1存在 2删除
 		Name         string         `db:"name"`           // 资源名称
@@ -41,8 +41,8 @@ type (
 		UpdateUserId sql.NullInt64  `db:"update_user_id"` // 更新者
 		UpdateTime   sql.NullTime   `db:"update_time"`    // 更新时间
 	}
-	//角色表
-	SysRole struct {
+	// Role 角色表
+	Role struct {
 		Id           uint64        `db:"id"`             // 唯一主键id
 		Deleted      uint64        `db:"deleted"`        // 标识是否删除1存在 2删除
 		Name         string        `db:"name"`           // 角色名字用作标识客户看到的名字，可根据不同业务来实现名字是否相同
@@ -52,8 +52,8 @@ type (
 		UpdateUserId sql.NullInt64 `db:"update_user_id"` // 更新者
 		UpdateTime   sql.NullTime  `db:"update_time"`    // 更新时间
 	}
-	//用户表
-	SysUser struct {
+	// User 用户表
+	User struct {
 		Id           uint64        `db:"id"`             // 唯一主键id
 		Deleted      uint64        `db:"deleted"`        // 标识是否删除1存在 2删除
 		Account      string        `db:"account"`        // 账号
