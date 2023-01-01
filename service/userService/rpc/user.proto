@@ -4,17 +4,23 @@ package user;
 
 option go_package = "./user";
 
-message IdReq{
+message UserId{
   uint64 id = 1;
 }
 
-message UserInfoReply{
-  uint64 id = 1;
-  string name = 2;
-  string number = 3;
-  string gender = 4;
+message SysUser{
+    uint64 id           =1;           // 唯一主键id
+    string name         =2;           // 名字存在另一张表中
+    string account      =3;           // 账号
+    string password     =4;           // 密码
+    uint64 dictId       =5;           // 性别（男|女|未知）
+    string secret       =6;           // 用户随机生成secret，用作token生成
+    string prevSecret   =7;           // 用户私有secret
+    uint64 tokenExpire  =8;           // token时间 单位秒
 }
+
+
 
 service user {
-  rpc getUser(IdReq) returns(UserInfoReply);
+  rpc getUser(UserId) returns(SysUser);
 }

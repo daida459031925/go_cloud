@@ -12,7 +12,7 @@ import (
 func Parse(w http.ResponseWriter, r *http.Request, v interface{}) bool {
 	if err := httpx.Parse(r, v); err != nil {
 		logx.Error(err)
-		httpx.OkJson(w, result.Error(constant.ErrhttpxParse00_01))
+		httpx.OkJson(w, result.Error(constant.ErrHttpxParse00_01))
 		return true
 	}
 

@@ -1,11 +1,12 @@
 Name: user-api
 Host: 0.0.0.0
-Port: 8888
+Port: 9000
 Mysql:
 #  DataSource: root:MYSQL@tcp(daida.tpddns.cn:23306)/go_cloud?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
   DataSource: root:MYSQL@tcp(192.168.0.100:3306)/go_cloud?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
 CacheRedis:
-  - Host: daida.tpddns.cn:26379
+#  - Host: daida.tpddns.cn:26379
+  - Host: 192.168.0.100:6379
     pass:
     Type: node
 Auth:

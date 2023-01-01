@@ -6,7 +6,8 @@ import (
 	"github.com/daida459031925/common/result"
 	"github.com/zeromicro/go-zero/core/logx"
 	"service/common/constant"
-	"service/common/token"
+	"service/common/constant/sex"
+	"service/common/middlewares"
 	"service/userService/api/internal/svc"
 	"service/userService/api/internal/types"
 	"strings"
@@ -55,23 +56,15 @@ func (l *LoginLogic) Login(req types.Login) (resp result.Result) {
 	payloads["secret"] = user.Secret
 	payloads["userId"] = user.Id
 
-	s, accessExpire, e := token.GetToken(user.Secret, payloads, user.TokenExpire)
+	s, accessExpire, e := middlewares.GetToken(user.Secret, payloads, user.TokenExpire)
 	if e != nil {
 		return result.Error(loginErrString)
 	}
 
 	var gender string
 
-	switch user.DictId {
-	case 0:
-		gender = "未知"
-	case 1:
-		gender = "男"
-	case 2:
-		gender = "女"
-	default:
-		gender = "未知"
-	}
+	var sex = sex.Sex(user.DictId)
+	gender = sex.String()
 
 	// ---end---
 	ru := &types.RUserToken{

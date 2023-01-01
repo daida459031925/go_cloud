@@ -3,6 +3,7 @@ module service
 go 1.19
 
 require (
+	github.com/Knetic/govaluate v3.0.0+incompatible
 	github.com/apache/pulsar-client-go v0.8.1
 	github.com/daida459031925/common v0.0.0-20220919063341-a55197e76789
 	github.com/go-playground/locales v0.14.0
@@ -12,9 +13,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/pkg/errors v0.9.1
 	github.com/shopspring/decimal v1.3.1
-	github.com/zeromicro/go-zero v1.4.0
-	gocv.io/x/gocv v0.31.0
-	golang.org/x/net v0.0.0-20220531201128-c960675eff93
+	github.com/zeromicro/go-zero v1.4.2
 	golang.org/x/text v0.3.8-0.20211105212822-18b340fc7af2
 	google.golang.org/grpc v1.48.0
 	google.golang.org/protobuf v1.28.1
@@ -86,6 +85,7 @@ require (
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect
+	golang.org/x/net v0.0.0-20220531201128-c960675eff93 // indirect
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect

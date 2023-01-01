@@ -1,3 +1,11 @@
+# 优先查看官网内容
+    https://go-zero.dev/cn/
+# 准备阶段
+1.下载 goctl
+    go install github.com/zeromicro/go-zero/tools/goctl@latest
+2.goctl一键安装
+    goctl env check -i -f --verbose
+
 # go mod 
 出现异常使用  go mod tidy
 

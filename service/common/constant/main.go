@@ -53,7 +53,10 @@ const (
 
 	ErrAllErrorInit00_01 = "全局err打印位置为："
 	ErrAllXssInit00_01   = "全局XSS打印位置为："
-	ErrhttpxParse00_01   = "参数解析异常"
+	ErrHttpxParse00_01   = "参数解析异常"
+
+	ErrBloom00_00 = "未创建成功布隆过滤器"
+	ErrBloom00_01 = "设置布隆过滤器的失效时间失败"
 
 	//基本使用信息
 	UseClientPulsar01s_01           = "pulsar://%s"

@@ -1,12 +1,6 @@
 Name: user.rpc
-ListenOn: 127.0.0.1:8080
-Mysql:
-  DataSource: root:MYSQL@tcp(192.168.0.100:3306)/go_cloud?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
-CacheRedis:
-  - Host: 192.168.0.100:6379
-    pass:
-    Type: node
+ListenOn: 0.0.0.0:8080
 Etcd:
   Hosts:
-  - 192.168.0.100:23791
+  - 127.0.0.1:2379
   Key: user.rpc
